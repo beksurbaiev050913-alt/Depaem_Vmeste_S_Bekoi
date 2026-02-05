@@ -1,1 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Beka-Depaet-BezOstanovki</title>
+<style>
+* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #1b0033, #000);
+  color: #fff;
+}
+header {
+  text-align: center;
+  padding: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ff3cff;
+  text-shadow: 0 0 10px #ff3cff;
+}
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  background: #12001f;
+  padding: 10px;
+}
+nav button {
+  background: none;
+  border: 2px solid #ff3cff;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+nav button:hover {
+  background: #ff3cff;
+  color: #000;
+}
+#balance {
+  text-align: center;
+  margin: 15px;
+  font-size: 20px;
+}
+.section {
+  display: none;
+  padding: 20px;
+}
+.section.active {
+  display: block;
+}
+.cases {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.case {
+  background: #1e0033;
+  border: 2px solid #00f7ff;
+  border-radius: 20px;
+  padding: 20px;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 0 15px #00f7ff;
+}
+.case h3 { margin-bottom: 10px; }
+.case button {
+  margin-top: 10px;
+  background: #00f7ff;
+  border: none;
+  padding: 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+#roll {
+  margin: 30px auto;
+  width: 80%;
+  height: 120px;
+  border: 2px solid #fff;
+  overflow: hidden;
+  position: relative;
+  display: none;
+}
+#rollLine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: red;
+  z-index: 5;
+}
+#rollItems {
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+.rollItem {
+  width: 120px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+.inventory {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.item {
+  background: #1e0033;
+  border-radius: 15px;
+  padding: 15px;
+  width: 200px;
+  box-shadow: 0 0 10px #ff3cff;
+}
+.item button {
+  margin-top: 10px;
+  width: 100%;
+  background: #ff3cff;
+  border: none;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.silver { background:#777; }
+.green { background:#1fa91f; }
+.blue { background:#0066ff; }
+.epic { background:#8000ff; }
+.mythic { background:#ff0033; }
+.legend { background:#ffd700; color:#000; }
+</style>
+</head>
+<body>
+
+<header>Бека депает — и ты депай!</header>
+
+<div id="balance">Баланс: <span id="coins">1800</span> CosmosCoins</div>
+
+<nav>
+  <button onclick="showSection('cases')">Кейсы</button>
+  <button onclick="showSection('inventory')">Мои герои</button>
+  <button onclick="window.open('https://t.me/KosmosHardoxxx','_blank')">Тех.Поддержка</button>
+</nav>
+
+<div id="cases" class="section active">
+  <div class="cases">
+    <div class="case">
+      <h3>Кейс Новичок</h3>
+      <p>Цена: 90 CC</p>
+      <button onclick="openCase(90, 'novice')">Открыть</button>
+    </div>
+    <div class="case">
+      <h3>Кейс Стандартный</h3>
+      <p>Цена: 230 CC</p>
+      <button onclick="openCase(230, 'standard')">Открыть</button>
+    </div>
+    <div class="case">
+      <h3>Кейс Дубайский</h3>
+      <p>Цена: 499 CC</p>
+      <button onclick="openCase(499, 'dubai')">Открыть</button>
+    </div>
+  </div>
+
+  <div id="roll">
+    <div id="rollLine"></div>
+    <div id="rollItems"></div>
+  </div>
+</div>
+
+<div id="inventory" class="section">
+  <div class="inventory" id="inv"></div>
+</div>
+
+<script>
+let coins = parseInt(localStorage.getItem('coins')) || 1800;
+let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+const prizes = {
+ silver: {price:70, items:["Мишка","Цветок","Сердечко","Роза","Подушка"]},
+ green: {price:170, items:["Черный кейс","Мышка","Ноутбук HP","Акула","Кошечка"]},
+ blue: {price:270, items:["Телефон Росо","Шапка","Кепка","Лягушечка","Персик"]},
+ epic: {price:370, items:["Остров Шумейла","Шуба LueVetton"]},
+ mythic: {price:550, items:["Кроссовки Abldas","Персик Серебряный"]},
+ legend: {price:7000, items:["Золотая чаша"]}
+};
+
+function save() {
+  localStorage.setItem('coins', coins);
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+  document.getElementById('coins').innerText = coins;
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  renderInv();
+}
+
+function rollPrize(caseType) {
+  let r = Math.random()*100;
+  if (r < 50) return "silver";
+  if (r < 77) return "green";
+  if (r < 92) return "blue";
+  if (r < 95) return "epic";
+  if (r < 98) return "mythic";
+  return "legend";
+}
+
+function openCase(price, type) {
+  if (coins < price) return alert("Недостаточно CosmosCoins");
+  coins -= price;
+  save();
+
+  const roll = document.getElementById('roll');
+  const rollItems = document.getElementById('rollItems');
+  roll.style.display = "block";
+  rollItems.innerHTML = "";
+
+  let resultRarity = rollPrize(type);
+  let resultItem = prizes[resultRarity].items[Math.floor(Math.random()*prizes[resultRarity].items.length)];
+
+  for(let i=0;i<30;i++){
+    let rar = rollPrize(type);
+    let el = document.createElement('div');
+    el.className = "rollItem " + rar;
+    el.innerText = prizes[rar].items[Math.floor(Math.random()*prizes[rar].items.length)];
+    rollItems.appendChild(el);
+  }
+
+  let final = document.createElement('div');
+  final.className = "rollItem " + resultRarity;
+  final.innerText = resultItem;
+  rollItems.appendChild(final);
+
+  rollItems.style.left = "0px";
+  setTimeout(()=>{
+    rollItems.style.transition = "left 3s cubic-bezier(.1,.9,.2,1)";
+    rollItems.style.left = "-2400px";
+  },100);
+
+  setTimeout(()=>{
+    inventory.push({name: resultItem, rarity: resultRarity});
+    save();
+    alert("Ты выбил: " + resultItem);
+    roll.style.display="none";
+  },3200);
+}
+
+function renderInv() {
+  const inv = document.getElementById('inv');
+  inv.innerHTML = "";
+  inventory.forEach((it, i)=>{
+    let d = document.createElement('div');
+    d.className = "item " + it.rarity;
+    d.innerHTML = `<b>${it.name}</b><br>Цена: ${prizes[it.rarity].price} CC`;
+    let b = document.createElement('button');
+    b.innerText = "Продать";
+    b.onclick = ()=>{
+      coins += prizes[it.rarity].price;
+      inventory.splice(i,1);
+      save();
+      renderInv();
+    };
+    d.appendChild(b);
+    inv.appendChild(d);
+  });
+}
+
+save();
+</script>
+
+</body>
+</html>
 
