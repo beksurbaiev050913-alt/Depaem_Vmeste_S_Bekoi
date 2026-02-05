@@ -5,14 +5,12 @@
 <title>Beka-Depaet-BezOstanovki</title>
 
 <style>
-* { box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
-
+*{box-sizing:border-box;font-family:Segoe UI,sans-serif}
 body{
   margin:0;
   background:radial-gradient(circle at top,#2a0040,#000);
   color:#fff;
 }
-
 header{
   text-align:center;
   padding:20px;
@@ -21,8 +19,7 @@ header{
   color:#ff4dff;
   text-shadow:0 0 15px #ff4dff;
 }
-
-#balance{ text-align:center; font-size:20px; }
+#balance{text-align:center;font-size:20px;margin-bottom:10px}
 
 nav{
   display:flex;
@@ -31,7 +28,6 @@ nav{
   background:#140020;
   padding:10px;
 }
-
 nav button{
   border:2px solid #00f7ff;
   background:none;
@@ -40,11 +36,10 @@ nav button{
   border-radius:25px;
   cursor:pointer;
 }
+nav button:hover{background:#00f7ff;color:#000}
 
-nav button:hover{ background:#00f7ff; color:#000; }
-
-.section{ display:none; padding:20px; }
-.section.active{ display:block; }
+.section{display:none;padding:20px}
+.section.active{display:block}
 
 .cases{
   display:flex;
@@ -52,16 +47,13 @@ nav button:hover{ background:#00f7ff; color:#000; }
   justify-content:center;
   flex-wrap:wrap;
 }
-
 .case{
   width:230px;
   padding:20px;
   border-radius:25px;
   text-align:center;
 }
-
-.case .emoji{ font-size:48px; }
-
+.case .emoji{font-size:48px}
 .case button{
   width:100%;
   margin-top:10px;
@@ -72,9 +64,9 @@ nav button:hover{ background:#00f7ff; color:#000; }
   font-weight:bold;
 }
 
-.bronze{ background:linear-gradient(145deg,#8b5a2b,#c68642); }
-.silverCase{ background:linear-gradient(145deg,#9aa7b2,#4facfe); }
-.gold{ background:linear-gradient(145deg,#ffd700,#ff9900); color:#000; }
+.bronze{background:linear-gradient(145deg,#8b5a2b,#c68642)}
+.silverCase{background:linear-gradient(145deg,#9aa7b2,#4facfe)}
+.gold{background:linear-gradient(145deg,#ffd700,#ff9900);color:#000}
 
 #roll{
   margin:30px auto;
@@ -86,7 +78,6 @@ nav button:hover{ background:#00f7ff; color:#000; }
   display:none;
   border-radius:20px;
 }
-
 #rollLine{
   position:absolute;
   left:50%;
@@ -96,13 +87,11 @@ nav button:hover{ background:#00f7ff; color:#000; }
   background:red;
   z-index:5;
 }
-
 #rollItems{
   display:flex;
   position:absolute;
   height:100%;
 }
-
 .rollItem{
   width:140px;
   margin:10px;
@@ -114,8 +103,7 @@ nav button:hover{ background:#00f7ff; color:#000; }
   font-weight:bold;
   text-align:center;
 }
-
-.rollItem span{ font-size:34px; }
+.rollItem span{font-size:34px}
 
 .win{
   outline:4px solid gold;
@@ -129,16 +117,13 @@ nav button:hover{ background:#00f7ff; color:#000; }
   flex-wrap:wrap;
   justify-content:center;
 }
-
 .item{
   width:200px;
   padding:15px;
   border-radius:20px;
   text-align:center;
 }
-
-.item span{ font-size:40px; }
-
+.item span{font-size:40px}
 .item button{
   width:100%;
   margin-top:8px;
@@ -149,12 +134,12 @@ nav button:hover{ background:#00f7ff; color:#000; }
   font-weight:bold;
 }
 
-.silver{ background:#aaa; }
-.green{ background:#2ecc71; }
-.blue{ background:#3498db; }
-.epic{ background:#9b59b6; }
-.mythic{ background:#e74c3c; }
-.legend{ background:#f1c40f; color:#000; }
+.silver{background:#aaa}
+.green{background:#2ecc71}
+.blue{background:#3498db}
+.epic{background:#9b59b6}
+.mythic{background:#e74c3c}
+.legend{background:#f1c40f;color:#000}
 </style>
 </head>
 
@@ -171,28 +156,24 @@ nav button:hover{ background:#00f7ff; color:#000; }
 
 <div id="cases" class="section active">
   <div class="cases">
-
     <div class="case bronze">
       <div class="emoji">📦</div>
       <h3>Новичок</h3>
       <p>90 CC</p>
       <button onclick="openCase(90)">Открыть</button>
     </div>
-
     <div class="case silverCase">
       <div class="emoji">🧊</div>
       <h3>Стандартный</h3>
       <p>230 CC</p>
       <button onclick="openCase(230)">Открыть</button>
     </div>
-
     <div class="case gold">
       <div class="emoji">💎</div>
       <h3>Дубайский</h3>
       <p>499 CC</p>
       <button onclick="openCase(499)">Открыть</button>
     </div>
-
   </div>
 
   <div id="roll">
@@ -209,39 +190,38 @@ nav button:hover{ background:#00f7ff; color:#000; }
 let coins = Number(localStorage.getItem("coins")) || 1800;
 let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
 
-const prizes = {
-  silver:{price:70, items:[
+const prizes={
+  silver:{price:70,items:[
     {n:"Мишка",e:"🧸"},{n:"Цветок",e:"🌸"},{n:"Сердце",e:"❤️"},
     {n:"Роза",e:"🌹"},{n:"Подушка",e:"🛏️"}
   ]},
-  green:{price:170, items:[
+  green:{price:170,items:[
     {n:"Кейс",e:"📦"},{n:"Мышка",e:"🖱️"},
     {n:"Ноутбук",e:"💻"},{n:"Акула",e:"🦈"},{n:"Котик",e:"🐱"}
   ]},
-  blue:{price:270, items:[
+  blue:{price:270,items:[
     {n:"Телефон",e:"📱"},{n:"Шапка",e:"🧢"},
     {n:"Кепка",e:"👒"},{n:"Лягушка",e:"🐸"},{n:"Персик",e:"🍑"}
   ]},
-  epic:{price:370, items:[
+  epic:{price:370,items:[
     {n:"Остров",e:"🏝️"},{n:"Шуба",e:"🧥"}
   ]},
-  mythic:{price:550, items:[
-    {n:"Кроссовки",e:"👟"},{n:"Серебр. Персик",e:"🍑✨"}
+  mythic:{price:550,items:[
+    {n:"Кроссовки",e:"👟"},{n:"Серебряный персик",e:"🍑✨"}
   ]},
-  legend:{price:7000, items:[
+  legend:{price:7000,items:[
     {n:"Золотая чаша",e:"🏆"}
   ]}
 };
 
-// РЕАЛЬНО РАБОЧИЕ ШАНСЫ
 function rollRarity(){
-  let r = Math.random()*100;
-  if(r<50) return "silver";
-  if(r<88) return "green";
-  if(r<115) return "blue";
-  if(r<130) return "epic";
-  if(r<147) return "mythic";
-  return "legend";
+  const r=Math.random()*100;
+  if(r<50) return"silver";
+  if(r<70) return"green";
+  if(r<85) return"blue";
+  if(r<93) return"epic";
+  if(r<98) return"mythic";
+  return"legend";
 }
 
 function save(){
