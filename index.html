@@ -5,19 +5,27 @@
 <title>Beka-Depaet-BezOstanovki</title>
 
 <style>
-*{box-sizing:border-box;font-family:Segoe UI,sans-serif}
 body{
   margin:0;
+  font-family:Segoe UI,sans-serif;
   background:radial-gradient(circle at top,#2a0040,#000);
   color:#fff;
 }
 header{
   text-align:center;
   padding:20px;
-  font-size:30px;
+  font-size:28px;
   font-weight:900;
   color:#ff4dff;
   text-shadow:0 0 15px #ff4dff;
+}
+header button{
+  margin-top:10px;
+  padding:8px 16px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
 }
 #balance{text-align:center;font-size:20px;margin-bottom:10px}
 
@@ -41,112 +49,62 @@ nav button:hover{background:#00f7ff;color:#000}
 .section{display:none;padding:20px}
 .section.active{display:block}
 
-.cases{
-  display:flex;
-  gap:30px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-.case{
-  width:230px;
-  padding:20px;
-  border-radius:25px;
-  text-align:center;
-}
-.case .emoji{font-size:48px}
-.case button{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:20px;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-.bronze{background:linear-gradient(145deg,#8b5a2b,#c68642)}
-.silverCase{background:linear-gradient(145deg,#9aa7b2,#4facfe)}
-.gold{background:linear-gradient(145deg,#ffd700,#ff9900);color:#000}
-
-#roll{
-  margin:30px auto;
-  width:90%;
-  height:140px;
-  border:3px solid #fff;
-  overflow:hidden;
-  position:relative;
+/* --- модалки --- */
+.modal{
   display:none;
-  border-radius:20px;
-}
-#rollLine{
-  position:absolute;
-  left:50%;
-  top:0;
-  width:4px;
-  height:100%;
-  background:red;
-  z-index:5;
-}
-#rollItems{
-  display:flex;
-  position:absolute;
-  height:100%;
-}
-.rollItem{
-  width:140px;
-  margin:10px;
-  border-radius:15px;
-  display:flex;
-  flex-direction:column;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  justify-content:center;
   align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  text-align:center;
+  z-index:9999;
 }
-.rollItem span{font-size:34px}
-
-.win{
-  outline:4px solid gold;
-  box-shadow:0 0 25px gold;
-  transform:scale(1.1);
-}
-
-.inventory{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-  justify-content:center;
-}
-.item{
-  width:200px;
-  padding:15px;
+.modal .box{
+  background:#1b0030;
+  padding:25px;
   border-radius:20px;
+  width:300px;
   text-align:center;
 }
-.item span{font-size:40px}
-.item button{
+.modal input{
   width:100%;
-  margin-top:8px;
+  margin-bottom:10px;
   padding:8px;
+  border-radius:10px;
   border:none;
+}
+.modal button{
+  margin-top:5px;
+  padding:8px 14px;
   border-radius:15px;
+  border:none;
   cursor:pointer;
-  font-weight:bold;
 }
 
-.silver{background:#aaa}
-.green{background:#2ecc71}
-.blue{background:#3498db}
-.epic{background:#9b59b6}
-.mythic{background:#e74c3c}
-.legend{background:#f1c40f;color:#000}
+/* уведомления */
+#notify{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#00f7ff;
+  color:#000;
+  padding:15px;
+  border-radius:15px;
+  display:none;
+  font-weight:bold;
+}
 </style>
 </head>
 
 <body>
 
-<header>Бека депает — и ты депай!</header>
-<div id="balance">Баланс: <span id="coins">1800</span> CC</div>
+<header>
+  Бека депает — и ты депай!
+  <br>
+  <button onclick="openAuth()">👤 Войти / Регистрация</button>
+</header>
+
+<div id="balance">Баланс: <span id="coins">0</span> CC</div>
 
 <nav>
   <button onclick="show('cases')">Кейсы</button>
@@ -155,148 +113,147 @@ nav button:hover{background:#00f7ff;color:#000}
 </nav>
 
 <div id="cases" class="section active">
-  <div class="cases">
-    <div class="case bronze">
-      <div class="emoji">📦</div>
-      <h3>Новичок</h3>
-      <p>90 CC</p>
-      <button onclick="openCase(90)">Открыть</button>
-    </div>
-    <div class="case silverCase">
-      <div class="emoji">🧊</div>
-      <h3>Стандартный</h3>
-      <p>230 CC</p>
-      <button onclick="openCase(230)">Открыть</button>
-    </div>
-    <div class="case gold">
-      <div class="emoji">💎</div>
-      <h3>Дубайский</h3>
-      <p>499 CC</p>
-      <button onclick="openCase(499)">Открыть</button>
-    </div>
-  </div>
-
-  <div id="roll">
-    <div id="rollLine"></div>
-    <div id="rollItems"></div>
-  </div>
+  <p style="text-align:center">🎁 Кейсы будут тут (можно вставить твой старый код)</p>
 </div>
 
 <div id="inventory" class="section">
-  <div class="inventory" id="inv"></div>
+  <p style="text-align:center">🎒 Инвентарь игрока</p>
 </div>
 
+<!-- АККАУНТ -->
+<div id="auth" class="modal">
+  <div class="box">
+    <h3>👤 Аккаунт</h3>
+    <input id="nick" placeholder="Ник">
+    <input id="pass" type="password" placeholder="Пароль">
+    <button onclick="auth()">Войти / Создать</button>
+    <button onclick="closeAuth()">Закрыть</button>
+  </div>
+</div>
+
+<!-- АДМИН -->
+<div id="admin" class="modal">
+  <div class="box">
+    <h3>👑 Админ-панель</h3>
+    <input id="adminNick" placeholder="Ник игрока">
+    <input id="adminAmount" placeholder="Сколько CC">
+    <button onclick="giveCC()">Выдать</button>
+    <button onclick="closeAdmin()">Закрыть</button>
+  </div>
+</div>
+
+<div id="notify"></div>
+
 <script>
-let coins = Number(localStorage.getItem("coins")) || 1800;
-let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+/* ---------------- ДАННЫЕ ---------------- */
+let coins = 1800;
+let inventory = [];
+let currentUser = localStorage.getItem("currentUser");
+let users = JSON.parse(localStorage.getItem("users") || "{}");
 
-const prizes={
-  silver:{price:70,items:[
-    {n:"Мишка",e:"🧸"},{n:"Цветок",e:"🌸"},{n:"Сердце",e:"❤️"},
-    {n:"Роза",e:"🌹"},{n:"Подушка",e:"🛏️"}
-  ]},
-  green:{price:170,items:[
-    {n:"Кейс",e:"📦"},{n:"Мышка",e:"🖱️"},
-    {n:"Ноутбук",e:"💻"},{n:"Акула",e:"🦈"},{n:"Котик",e:"🐱"}
-  ]},
-  blue:{price:270,items:[
-    {n:"Телефон",e:"📱"},{n:"Шапка",e:"🧢"},
-    {n:"Кепка",e:"👒"},{n:"Лягушка",e:"🐸"},{n:"Персик",e:"🍑"}
-  ]},
-  epic:{price:370,items:[
-    {n:"Остров",e:"🏝️"},{n:"Шуба",e:"🧥"}
-  ]},
-  mythic:{price:550,items:[
-    {n:"Кроссовки",e:"👟"},{n:"Серебряный персик",e:"🍑✨"}
-  ]},
-  legend:{price:7000,items:[
-    {n:"Золотая чаша",e:"🏆"}
-  ]}
-};
-
-function rollRarity(){
-  const r=Math.random()*100;
-  if(r<50) return"silver";
-  if(r<70) return"green";
-  if(r<85) return"blue";
-  if(r<93) return"epic";
-  if(r<98) return"mythic";
-  return"legend";
+/* ---------------- ВОССТАНОВЛЕНИЕ ---------------- */
+if(currentUser && users[currentUser]){
+  coins = users[currentUser].coins;
+  inventory = users[currentUser].inventory || [];
 }
 
-function save(){
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("inventory",JSON.stringify(inventory));
-  document.getElementById("coins").innerText=coins;
+/* ---------------- БАЛАНС ---------------- */
+function update(){
+  document.getElementById("coins").innerText = coins;
+  if(currentUser){
+    users[currentUser].coins = coins;
+    users[currentUser].inventory = inventory;
+    localStorage.setItem("users",JSON.stringify(users));
+  }
+}
+update();
+
+/* ---------------- УВЕДОМЛЕНИЯ ---------------- */
+function notify(text){
+  const n=document.getElementById("notify");
+  n.innerText=text;
+  n.style.display="block";
+  setTimeout(()=>n.style.display="none",4000);
 }
 
+/* ---------------- АККАУНТ ---------------- */
+function openAuth(){document.getElementById("auth").style.display="flex"}
+function closeAuth(){document.getElementById("auth").style.display="none"}
+
+function auth(){
+  const nick=nickInput.value.trim();
+  const pass=passInput.value;
+  if(!nick||!pass) return alert("Заполни поля");
+
+  if(users[nick]){
+    if(users[nick].pass!==pass) return alert("Неверный пароль");
+    coins = users[nick].coins;
+    inventory = users[nick].inventory;
+    notify("🎉 Вход выполнен! +2000 CC");
+  } else {
+    users[nick]={pass,coins:2000,inventory:[],lastBonus:null};
+    coins=2000;
+    inventory=[];
+    notify("🎁 Регистрация успешна! +2000 CC");
+  }
+
+  coins+=2000;
+  currentUser=nick;
+  localStorage.setItem("currentUser",nick);
+  localStorage.setItem("users",JSON.stringify(users));
+  update();
+  closeAuth();
+}
+
+/* ---------------- ЕЖЕДНЕВНЫЙ БОНУС ---------------- */
+function moscowDate(){
+  const n=new Date();
+  return new Date(n.getTime()+n.getTimezoneOffset()*60000+3*3600000);
+}
+(function(){
+  if(!currentUser) return;
+  const now=moscowDate();
+  const key=now.toDateString();
+  if(now.getHours()>=5 && users[currentUser].lastBonus!==key){
+    coins+=800;
+    users[currentUser].lastBonus=key;
+    notify("🌅 Ежедневный бонус: +800 CC");
+    update();
+  }
+})();
+
+/* ---------------- АДМИН ---------------- */
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey && e.code==="KeyB"){
+    document.getElementById("admin").style.display="flex";
+  }
+});
+function closeAdmin(){document.getElementById("admin").style.display="none"}
+
+function giveCC(){
+  const nick=adminNick.value.trim();
+  const amount=Number(adminAmount.value);
+  if(!users[nick]) return alert("Аккаунт не найден");
+  if(amount<=0||isNaN(amount)) return alert("Неверная сумма");
+
+  users[nick].coins+=amount;
+  localStorage.setItem("users",JSON.stringify(users));
+
+  if(currentUser===nick){
+    coins+=amount;
+    update();
+    notify(`👑 Директор выдал тебе ${amount} CC`);
+  }
+
+  alert(`✅ ${nick} получил ${amount} CC`);
+  closeAdmin();
+}
+
+/* ---------------- НАВИГАЦИЯ ---------------- */
 function show(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  renderInv();
 }
-
-function openCase(price){
-  if(coins<price) return alert("Недостаточно CC");
-  coins-=price; save();
-
-  const roll=document.getElementById("roll");
-  const items=document.getElementById("rollItems");
-  items.innerHTML="";
-  items.style.transition="none";
-  roll.style.display="block";
-
-  const rarity=rollRarity();
-  const item=prizes[rarity].items[Math.floor(Math.random()*prizes[rarity].items.length)];
-
-  for(let i=0;i<20;i++){
-    let r=rollRarity();
-    let it=prizes[r].items[Math.floor(Math.random()*prizes[r].items.length)];
-    items.innerHTML+=`<div class="rollItem ${r}"><span>${it.e}</span>${it.n}</div>`;
-  }
-
-  items.innerHTML+=`<div class="rollItem ${rarity} win"><span>${item.e}</span>${item.n}<small>ТВОЙ ВЫИГРЫШ</small></div>`;
-
-  for(let i=0;i<5;i++){
-    let r=rollRarity();
-    let it=prizes[r].items[Math.floor(Math.random()*prizes[r].items.length)];
-    items.innerHTML+=`<div class="rollItem ${r}"><span>${it.e}</span>${it.n}</div>`;
-  }
-
-  items.style.left="0px";
-  setTimeout(()=>{
-    items.style.transition="left 3s cubic-bezier(.1,.9,.2,1)";
-    items.style.left="-2400px";
-  },100);
-
-  setTimeout(()=>{
-    inventory.push({name:item.n,emoji:item.e,rarity});
-    save();
-    alert(`🎉 Ты выбил: ${item.e} ${item.n}`);
-    roll.style.display="none";
-  },3200);
-}
-
-function renderInv(){
-  const inv=document.getElementById("inv");
-  inv.innerHTML="";
-  inventory.forEach((it,i)=>{
-    let d=document.createElement("div");
-    d.className="item "+it.rarity;
-    d.innerHTML=`<span>${it.emoji}</span><b>${it.name}</b><br>${prizes[it.rarity].price} CC`;
-    let b=document.createElement("button");
-    b.innerText="Продать";
-    b.onclick=()=>{
-      coins+=prizes[it.rarity].price;
-      inventory.splice(i,1);
-      save(); renderInv();
-    };
-    d.appendChild(b);
-    inv.appendChild(d);
-  });
-}
-
-save();
 </script>
 
 </body>
