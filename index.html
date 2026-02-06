@@ -27,6 +27,7 @@ nav{
   gap:15px;
   background:#140020;
   padding:10px;
+  flex-wrap:wrap;
 }
 nav button{
   border:2px solid #00f7ff;
@@ -67,6 +68,7 @@ nav button:hover{background:#00f7ff;color:#000}
 .bronze{background:linear-gradient(145deg,#8b5a2b,#c68642)}
 .silverCase{background:linear-gradient(145deg,#9aa7b2,#4facfe)}
 .gold{background:linear-gradient(145deg,#ffd700,#ff9900);color:#000}
+.spring{background:linear-gradient(145deg,#ffb6c1,#ff69b4)}
 
 #roll{
   margin:30px auto;
@@ -150,36 +152,49 @@ nav button:hover{background:#00f7ff;color:#000}
 
 <nav>
   <button onclick="show('cases')">Кейсы</button>
+  <button onclick="show('spring')">🌸 Весенний кейс</button>
   <button onclick="show('inventory')">Мои герои</button>
-  <button onclick="window.open('https://t.me/KosmosHardoxxx','_blank')">Тех.Поддержка</button>
 </nav>
 
+<!-- ОБЫЧНЫЕ КЕЙСЫ -->
 <div id="cases" class="section active">
   <div class="cases">
     <div class="case bronze">
       <div class="emoji">📦</div>
       <h3>Новичок</h3>
       <p>90 CC</p>
-      <button onclick="openCase(90)">Открыть</button>
+      <button onclick="openCase('novice',90)">Открыть</button>
     </div>
     <div class="case silverCase">
       <div class="emoji">🧊</div>
       <h3>Стандартный</h3>
       <p>230 CC</p>
-      <button onclick="openCase(230)">Открыть</button>
+      <button onclick="openCase('standard',230)">Открыть</button>
     </div>
     <div class="case gold">
       <div class="emoji">💎</div>
       <h3>Дубайский</h3>
       <p>499 CC</p>
-      <button onclick="openCase(499)">Открыть</button>
+      <button onclick="openCase('dubai',499)">Открыть</button>
     </div>
   </div>
+</div>
 
-  <div id="roll">
-    <div id="rollLine"></div>
-    <div id="rollItems"></div>
+<!-- ВЕСЕННИЙ -->
+<div id="spring" class="section">
+  <div class="cases">
+    <div class="case spring">
+      <div class="emoji">🌸</div>
+      <h3>Весенний</h3>
+      <p>349 CC</p>
+      <button onclick="openCase('spring',349)">Открыть</button>
+    </div>
   </div>
+</div>
+
+<div id="roll">
+  <div id="rollLine"></div>
+  <div id="rollItems"></div>
 </div>
 
 <div id="inventory" class="section">
@@ -191,31 +206,42 @@ let coins = Number(localStorage.getItem("coins")) || 1800;
 let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
 
 const prizes={
-  silver:{price:70,items:[
-    {n:"Мишка",e:"🧸"},{n:"Цветок",e:"🌸"},{n:"Сердце",e:"❤️"},
-    {n:"Роза",e:"🌹"},{n:"Подушка",e:"🛏️"}
-  ]},
-  green:{price:170,items:[
-    {n:"Кейс",e:"📦"},{n:"Мышка",e:"🖱️"},
-    {n:"Ноутбук",e:"💻"},{n:"Акула",e:"🦈"},{n:"Котик",e:"🐱"}
-  ]},
-  blue:{price:270,items:[
-    {n:"Телефон",e:"📱"},{n:"Шапка",e:"🧢"},
-    {n:"Кепка",e:"👒"},{n:"Лягушка",e:"🐸"},{n:"Персик",e:"🍑"}
-  ]},
-  epic:{price:370,items:[
-    {n:"Остров",e:"🏝️"},{n:"Шуба",e:"🧥"}
-  ]},
-  mythic:{price:550,items:[
-    {n:"Кроссовки",e:"👟"},{n:"Серебряный персик",e:"🍑✨"}
-  ]},
-  legend:{price:7000,items:[
-    {n:"Золотая чаша",e:"🏆"}
+  silver:{price:70,items:[{n:"Мишка",e:"🧸"},{n:"Цветок",e:"🌸"}]},
+  green:{price:170,items:[{n:"Мышка",e:"🖱️"},{n:"Котик",e:"🐱"}]},
+  blue:{price:270,items:[{n:"Телефон",e:"📱"},{n:"Лягушка",e:"🐸"}]},
+  epic:{price:370,items:[{n:"Шуба",e:"🧥"}]},
+  mythic:{price:550,items:[{n:"Кроссовки",e:"👟"}]},
+  legend:{price:7000,items:[{n:"Золотая чаша",e:"🏆"}]},
+  springEpic:{price:370,items:[{n:"Венок",e:"🌿"}]},
+  springLegend:{price:7000,items:[
+    {n:"Золотая чаша",e:"🏆"},
+    {n:"Золотой венок",e:"👑🌿"}
   ]}
 };
 
-function rollRarity(){
-  const r=Math.random()*100;
+function rollByCase(type){
+  let r=Math.random()*100;
+
+  if(type==="novice"){
+    if(r<50) return"silver";
+    if(r<75) return"green";
+    if(r<90) return"blue";
+    return"epic";
+  }
+
+  if(type==="dubai"){
+    if(r<40) return"blue";
+    if(r<70) return"epic";
+    if(r<90) return"mythic";
+    return"legend";
+  }
+
+  if(type==="spring"){
+    if(r<80) return"springEpic";
+    if(r<90) return"mythic";
+    return"springLegend";
+  }
+
   if(r<50) return"silver";
   if(r<70) return"green";
   if(r<85) return"blue";
@@ -236,45 +262,27 @@ function show(id){
   renderInv();
 }
 
-function openCase(price){
+function openCase(type,price){
   if(coins<price) return alert("Недостаточно CC");
   coins-=price; save();
 
   const roll=document.getElementById("roll");
   const items=document.getElementById("rollItems");
   items.innerHTML="";
-  items.style.transition="none";
   roll.style.display="block";
 
-  const rarity=rollRarity();
-  const item=prizes[rarity].items[Math.floor(Math.random()*prizes[rarity].items.length)];
+  const rarity=rollByCase(type);
+  const pool=prizes[rarity].items;
+  const item=pool[Math.floor(Math.random()*pool.length)];
 
-  for(let i=0;i<20;i++){
-    let r=rollRarity();
-    let it=prizes[r].items[Math.floor(Math.random()*prizes[r].items.length)];
-    items.innerHTML+=`<div class="rollItem ${r}"><span>${it.e}</span>${it.n}</div>`;
-  }
-
-  items.innerHTML+=`<div class="rollItem ${rarity} win"><span>${item.e}</span>${item.n}<small>ТВОЙ ВЫИГРЫШ</small></div>`;
-
-  for(let i=0;i<5;i++){
-    let r=rollRarity();
-    let it=prizes[r].items[Math.floor(Math.random()*prizes[r].items.length)];
-    items.innerHTML+=`<div class="rollItem ${r}"><span>${it.e}</span>${it.n}</div>`;
-  }
-
-  items.style.left="0px";
-  setTimeout(()=>{
-    items.style.transition="left 3s cubic-bezier(.1,.9,.2,1)";
-    items.style.left="-2400px";
-  },100);
+  items.innerHTML+=`<div class="rollItem ${rarity} win"><span>${item.e}</span>${item.n}</div>`;
 
   setTimeout(()=>{
     inventory.push({name:item.n,emoji:item.e,rarity});
     save();
     alert(`🎉 Ты выбил: ${item.e} ${item.n}`);
     roll.style.display="none";
-  },3200);
+  },1500);
 }
 
 function renderInv(){
