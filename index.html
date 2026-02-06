@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Beka-Depaet-BezOstanovki</title>
+<title>Beka Depaet</title>
 
 <style>
 *{box-sizing:border-box;font-family:Segoe UI,sans-serif}
@@ -65,7 +65,7 @@ nav button:hover{background:#00f7ff;color:#000}
 }
 
 .bronze{background:linear-gradient(145deg,#8b5a2b,#c68642)}
-.silverCase{background:linear-gradient(145deg,#9aa7b2,#4facfe)}
+.silver{background:linear-gradient(145deg,#9aa7b2,#4facfe)}
 .gold{background:linear-gradient(145deg,#ffd700,#ff9900);color:#000}
 .auto{background:linear-gradient(145deg,#00c6ff,#0072ff)}
 .japan{background:linear-gradient(145deg,#ff5f6d,#ffc371)}
@@ -94,6 +94,7 @@ nav button:hover{background:#00f7ff;color:#000}
   position:absolute;
   height:100%;
 }
+
 .rollItem{
   width:140px;
   margin:10px;
@@ -106,11 +107,12 @@ nav button:hover{background:#00f7ff;color:#000}
   text-align:center;
 }
 .rollItem span{font-size:34px}
-.win{
-  outline:4px solid gold;
-  box-shadow:0 0 25px gold;
-  transform:scale(1.1);
-}
+
+.blue{background:#3498db}
+.epic{background:#9b59b6}
+.mythic{background:#e74c3c}
+.legend{background:#f1c40f;color:#000}
+.ultra{background:#000;color:#ffd700;box-shadow:0 0 20px gold}
 
 .inventory{
   display:flex;
@@ -134,12 +136,6 @@ nav button:hover{background:#00f7ff;color:#000}
   cursor:pointer;
   font-weight:bold;
 }
-
-.blue{background:#3498db}
-.epic{background:#9b59b6}
-.mythic{background:#e74c3c}
-.legend{background:#f1c40f;color:#000}
-.ultra{background:#000;color:#ffd700;box-shadow:0 0 20px gold}
 </style>
 </head>
 
@@ -151,13 +147,12 @@ nav button:hover{background:#00f7ff;color:#000}
 <nav>
   <button onclick="show('cases')">Кейсы</button>
   <button onclick="show('inventory')">Мои герои</button>
-  <button onclick="window.open('https://t.me/KosmosHardoxxx','_blank')">Тех.Поддержка</button>
 </nav>
 
 <div id="cases" class="section active">
   <div class="cases">
     <div class="case bronze"><div class="emoji">📦</div><h3>Новичок</h3><p>90 CC</p><button onclick="openCase('basic',90)">Открыть</button></div>
-    <div class="case silverCase"><div class="emoji">🧊</div><h3>Стандарт</h3><p>230 CC</p><button onclick="openCase('standard',230)">Открыть</button></div>
+    <div class="case silver"><div class="emoji">🧊</div><h3>Стандарт</h3><p>230 CC</p><button onclick="openCase('standard',230)">Открыть</button></div>
     <div class="case gold"><div class="emoji">💎</div><h3>Дубайский</h3><p>499 CC</p><button onclick="openCase('dubai',499)">Открыть</button></div>
     <div class="case auto"><div class="emoji">🚗</div><h3>Авто кейс</h3><p>299 CC</p><button onclick="openCase('auto',299)">Открыть</button></div>
     <div class="case japan"><div class="emoji">🇯🇵</div><h3>Japan V1</h3><p>409 CC</p><button onclick="openCase('japan',409)">Открыть</button></div>
@@ -178,17 +173,26 @@ let coins = Number(localStorage.getItem("coins")) || 1800;
 let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
 
 const loot = {
-  basic:{blue:[["Мышка","🖱️",270]],epic:[["Шуба","🧥",370]]},
-  standard:{blue:[["Мышка","🖱️",270]],epic:[["Шуба","🧥",370]],legend:[["Золотая медаль","🥇",7000]]},
-  dubai:{epic:[["Шуба","🧥",370]],mythic:[["Остров","🏝️",550]],legend:[["Золотая медаль","🥇",7000]]},
-
+  basic:{
+    blue:[["Мышка","🖱️",270]],
+    epic:[["Шуба","🧥",370]]
+  },
+  standard:{
+    blue:[["Мышка","🖱️",270]],
+    epic:[["Шуба","🧥",370]],
+    legend:[["Золотая медаль","🥇",7000]]
+  },
+  dubai:{
+    epic:[["Шуба","🧥",370]],
+    mythic:[["Остров","🏝️",550]],
+    legend:[["Золотая медаль","🥇",7000]]
+  },
   auto:{
     blue:[["Honda Civic 2003","🚗",270],["Toyota Chaser V2","🚙",270],["Honda Fit","🚘",270]],
     epic:[["Camry 55","🚕",370],["Camry 70","🚖",370],["LC 200","🚙",370]],
     mythic:[["LC 570","🚙",550],["Mercedes W222","🚘",550]],
     legend:[["Porsche Spyder","🏎️",7000],["G63 Brabus","🚙",7000]]
   },
-
   japan:{
     epic:[["Суши из лосося","🍣",370]],
     mythic:[["Моти","🍡",550]],
@@ -198,11 +202,11 @@ const loot = {
 };
 
 function roll(type){
-  let r=Math.random()*100;
+  let r = Math.random()*100;
   if(type==="japan"){
-    if(r<1) return "ultra";
-    if(r<4) return "legend";
-    if(r<15) return "mythic";
+    if(r<0.7) return "ultra";
+    if(r<2.5) return "legend";
+    if(r<12) return "mythic";
     return "epic";
   }
   if(r<50) return "blue";
@@ -227,10 +231,6 @@ function openCase(type,price){
   if(coins<price) return alert("Недостаточно CC");
   coins-=price; save();
 
-  const rarity=roll(type);
-  const pool=loot[type][rarity];
-  const item=pool[Math.floor(Math.random()*pool.length)];
-
   const rollBox=document.getElementById("roll");
   const items=document.getElementById("rollItems");
   items.innerHTML="";
@@ -238,10 +238,19 @@ function openCase(type,price){
   items.style.transition="none";
   items.style.left="0px";
 
+  let finalItem, finalRarity;
+
   for(let i=0;i<25;i++){
-    let r=rarity;
-    let it=item;
-    items.innerHTML+=`<div class="rollItem ${r}"><span>${it[1]}</span>${it[0]}</div>`;
+    let rarity=roll(type);
+    let pool=loot[type][rarity];
+    let it=pool[Math.floor(Math.random()*pool.length)];
+
+    if(i===22){ finalItem=it; finalRarity=rarity; }
+
+    items.innerHTML+=`
+      <div class="rollItem ${rarity}">
+        <span>${it[1]}</span>${it[0]}
+      </div>`;
   }
 
   setTimeout(()=>{
@@ -250,9 +259,9 @@ function openCase(type,price){
   },100);
 
   setTimeout(()=>{
-    inventory.push({name:item[0],emoji:item[1],price:item[2],rarity});
+    inventory.push({name:finalItem[0],emoji:finalItem[1],price:finalItem[2],rarity:finalRarity});
     save();
-    alert(`🎉 Ты выбил: ${item[1]} ${item[0]}`);
+    alert(`🎉 Ты выбил: ${finalItem[1]} ${finalItem[0]}`);
     rollBox.style.display="none";
   },3200);
 }
