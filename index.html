@@ -55,6 +55,7 @@ nav button:hover{background:#00f7ff;color:#000}
   text-align:center;
 }
 .case .emoji{font-size:48px}
+
 .case button{
   width:100%;
   margin-top:10px;
@@ -73,7 +74,7 @@ nav button:hover{background:#00f7ff;color:#000}
 #roll{
   margin:30px auto;
   width:90%;
-  height:140px;
+  height:150px;
   border:3px solid #fff;
   overflow:hidden;
   position:relative;
@@ -87,12 +88,13 @@ nav button:hover{background:#00f7ff;color:#000}
   width:4px;
   height:100%;
   background:red;
-  z-index:5;
+  z-index:10;
 }
 #rollItems{
   display:flex;
   position:absolute;
   height:100%;
+  left:0;
 }
 .rollItem{
   width:140px;
@@ -103,15 +105,8 @@ nav button:hover{background:#00f7ff;color:#000}
   align-items:center;
   justify-content:center;
   font-weight:bold;
-  text-align:center;
 }
-.rollItem span{font-size:34px}
-
-.win{
-  outline:4px solid gold;
-  box-shadow:0 0 25px gold;
-  transform:scale(1.1);
-}
+.rollItem span{font-size:36px}
 
 .inventory{
   display:flex;
@@ -156,7 +151,6 @@ nav button:hover{background:#00f7ff;color:#000}
   <button onclick="show('inventory')">Мои герои</button>
 </nav>
 
-<!-- ОБЫЧНЫЕ КЕЙСЫ -->
 <div id="cases" class="section active">
   <div class="cases">
     <div class="case bronze">
@@ -180,7 +174,6 @@ nav button:hover{background:#00f7ff;color:#000}
   </div>
 </div>
 
-<!-- ВЕСЕННИЙ -->
 <div id="spring" class="section">
   <div class="cases">
     <div class="case spring">
@@ -206,42 +199,36 @@ let coins = Number(localStorage.getItem("coins")) || 1800;
 let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
 
 const prizes={
-  silver:{price:70,items:[{n:"Мишка",e:"🧸"},{n:"Цветок",e:"🌸"}]},
-  green:{price:170,items:[{n:"Мышка",e:"🖱️"},{n:"Котик",e:"🐱"}]},
-  blue:{price:270,items:[{n:"Телефон",e:"📱"},{n:"Лягушка",e:"🐸"}]},
+  silver:{price:70,items:[{n:"Мишка",e:"🧸"}]},
+  green:{price:170,items:[{n:"Мышка",e:"🖱️"}]},
+  blue:{price:270,items:[{n:"Телефон",e:"📱"}]},
   epic:{price:370,items:[{n:"Шуба",e:"🧥"}]},
   mythic:{price:550,items:[{n:"Кроссовки",e:"👟"}]},
   legend:{price:7000,items:[{n:"Золотая чаша",e:"🏆"}]},
-  springEpic:{price:370,items:[{n:"Венок",e:"🌿"}]},
-  springLegend:{price:7000,items:[
-    {n:"Золотая чаша",e:"🏆"},
-    {n:"Золотой венок",e:"👑🌿"}
-  ]}
+  springEpic:{price:370,items:[{n:"Шуба",e:"🧥"},{n:"Венок",e:"🌿"}]},
+  springLegend:{price:7000,items:[{n:"Золотая чаша",e:"🏆"},{n:"Золотой венок",e:"👑🌿"}]}
 };
 
-function rollByCase(type){
+function realRoll(type){
   let r=Math.random()*100;
-
+  if(type==="spring"){
+    if(r<40) return"blue";
+    if(r<65) return"springEpic";
+    if(r<85) return"mythic";
+    return"springLegend";
+  }
   if(type==="novice"){
     if(r<50) return"silver";
     if(r<75) return"green";
     if(r<90) return"blue";
     return"epic";
   }
-
   if(type==="dubai"){
     if(r<40) return"blue";
     if(r<70) return"epic";
     if(r<90) return"mythic";
     return"legend";
   }
-
-  if(type==="spring"){
-    if(r<80) return"springEpic";
-    if(r<90) return"mythic";
-    return"springLegend";
-  }
-
   if(r<50) return"silver";
   if(r<70) return"green";
   if(r<85) return"blue";
@@ -250,10 +237,44 @@ function rollByCase(type){
   return"legend";
 }
 
-function save(){
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("inventory",JSON.stringify(inventory));
-  document.getElementById("coins").innerText=coins;
+function openCase(type,price){
+  if(coins<price) return alert("Недостаточно CC");
+  coins-=price;
+  save();
+
+  const roll=document.getElementById("roll");
+  const items=document.getElementById("rollItems");
+  items.innerHTML="";
+  items.style.transition="none";
+  roll.style.display="block";
+
+  const winR=realRoll(type);
+  const winItem=prizes[winR].items[Math.floor(Math.random()*prizes[winR].items.length)];
+
+  let list=[];
+  for(let i=0;i<30;i++){
+    let r=realRoll(type);
+    let it=prizes[r].items[Math.floor(Math.random()*prizes[r].items.length)];
+    list.push({r,it});
+  }
+  list[20]={r:winR,it:winItem};
+
+  list.forEach(x=>{
+    items.innerHTML+=`<div class="rollItem ${x.r}"><span>${x.it.e}</span>${x.it.n}</div>`;
+  });
+
+  setTimeout(()=>{
+    items.style.transition="left 3s cubic-bezier(.1,.9,.2,1)";
+    items.style.left="-2520px";
+  },50);
+
+  setTimeout(()=>{
+    inventory.push({name:winItem.n,emoji:winItem.e,rarity:winR});
+    save();
+    alert(`🎉 Ты выбил: ${winItem.e} ${winItem.n}`);
+    roll.style.display="none";
+    items.style.left="0";
+  },3200);
 }
 
 function show(id){
@@ -262,27 +283,10 @@ function show(id){
   renderInv();
 }
 
-function openCase(type,price){
-  if(coins<price) return alert("Недостаточно CC");
-  coins-=price; save();
-
-  const roll=document.getElementById("roll");
-  const items=document.getElementById("rollItems");
-  items.innerHTML="";
-  roll.style.display="block";
-
-  const rarity=rollByCase(type);
-  const pool=prizes[rarity].items;
-  const item=pool[Math.floor(Math.random()*pool.length)];
-
-  items.innerHTML+=`<div class="rollItem ${rarity} win"><span>${item.e}</span>${item.n}</div>`;
-
-  setTimeout(()=>{
-    inventory.push({name:item.n,emoji:item.e,rarity});
-    save();
-    alert(`🎉 Ты выбил: ${item.e} ${item.n}`);
-    roll.style.display="none";
-  },1500);
+function save(){
+  localStorage.setItem("coins",coins);
+  localStorage.setItem("inventory",JSON.stringify(inventory));
+  document.getElementById("coins").innerText=coins;
 }
 
 function renderInv(){
