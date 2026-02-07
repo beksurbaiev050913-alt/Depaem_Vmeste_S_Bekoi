@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Кейсы Беки</title>
+<title>Vegas_Kazik</title>
 
 <style>
 body{
@@ -31,12 +31,12 @@ nav button{background:#00eaff;color:#000}
   padding:15px;
   border-radius:15px;
   margin:10px;
-  width:140px;
+  width:150px;
 }
 
 .item{
   display:inline-block;
-  width:160px;
+  width:170px;
   margin:8px;
   padding:10px;
   border-radius:15px;
@@ -48,6 +48,27 @@ nav button{background:#00eaff;color:#000}
 .legend{background:#f1c40f;color:#000}
 
 .hidden{display:none}
+
+#roulette{
+  margin-top:20px;
+  height:80px;
+  overflow:hidden;
+}
+
+.roll{
+  display:flex;
+  justify-content:center;
+  animation: spin 1.5s ease-out forwards;
+}
+
+.roll .item{
+  margin:0 5px;
+}
+
+@keyframes spin{
+  from{transform:translateX(-400px)}
+  to{transform:translateX(0)}
+}
 </style>
 </head>
 
@@ -64,7 +85,6 @@ nav button{background:#00eaff;color:#000}
   <button onclick="show('inv')">Мои герои</button>
 </nav>
 
-<!-- КЕЙСЫ -->
 <div id="cases">
   <div class="case">
     <b>Новичок</b><br>100 CC<br>
@@ -87,7 +107,7 @@ nav button{background:#00eaff;color:#000}
   </div>
 </div>
 
-<!-- ИНВЕНТАРЬ -->
+<div id="roulette" class="hidden"></div>
 <div id="inv" class="hidden"></div>
 
 <script>
@@ -112,8 +132,8 @@ const loot = {
     {n:"Остров",r:"mythic",p:780,d:780}
   ],
   dubai:[
-    {n:"Золотая медаль",r:"legend",p:1100,d:1300},
-    {n:"Квартира Бишкек",r:"mythic",p:780,d:780}
+    {n:"Квартира Бишкек",r:"mythic",p:780,d:780},
+    {n:"Золотая медаль",r:"legend",p:1100,d:1300}
   ],
   dusty:[
     {n:"Золотая чаша",r:"legend",p:11600},
@@ -138,55 +158,58 @@ function save(){
 }
 
 function show(id){
-  document.getElementById("cases").classList.add("hidden");
-  document.getElementById("inv").classList.add("hidden");
+  ["cases","inv","roulette"].forEach(x=>{
+    document.getElementById(x).classList.add("hidden");
+  });
   document.getElementById(id).classList.remove("hidden");
-  renderInv();
+  if(id==="inv") renderInv();
 }
 
 function openCase(type){
   let price = prices[type];
-
   if(price.cc && cc < price.cc) return alert("Недостаточно CC");
   if(price.dust && dust < price.dust) return alert("Недостаточно пыли");
 
   if(price.cc) cc -= price.cc;
   if(price.dust) dust -= price.dust;
+  save();
+
+  show("roulette");
+  let r = document.getElementById("roulette");
+  r.innerHTML = "<div class='roll'></div>";
+  let roll = r.firstChild;
 
   let pool = loot[type];
-  let item = pool[Math.floor(Math.random()*pool.length)];
-  inventory.push(item);
+  let real = pool[Math.floor(Math.random()*pool.length)];
 
-  save();
-  alert("Ты выбил: "+item.n);
+  for(let i=0;i<8;i++){
+    let fake = pool[Math.floor(Math.random()*pool.length)];
+    roll.innerHTML += `<div class="item ${fake.r}">${fake.n}</div>`;
+  }
+  roll.innerHTML += `<div class="item ${real.r}"><b>${real.n}</b></div>`;
+
+  setTimeout(()=>{
+    inventory.push(real);
+    save();
+    alert("Ты выбил: "+real.n);
+    show("inv");
+  },1500);
 }
 
 function renderInv(){
   let div = document.getElementById("inv");
   div.innerHTML="";
-
   inventory.forEach((it,i)=>{
-    let d = document.createElement("div");
+    let d=document.createElement("div");
     d.className="item "+it.r;
     d.innerHTML=`<b>${it.n}</b><br>${it.p} CC<br>`;
-
-    let sell = document.createElement("button");
-    sell.innerText="Продать";
-    sell.onclick=()=>{
-      cc+=it.p;
-      inventory.splice(i,1);
-      save(); renderInv();
-    };
-
-    let dis = document.createElement("button");
+    let s=document.createElement("button");
+    s.innerText="Продать";
+    s.onclick=()=>{cc+=it.p;inventory.splice(i,1);save();renderInv();};
+    let dis=document.createElement("button");
     dis.innerText="Распылить";
-    dis.onclick=()=>{
-      dust+=(it.d||0);
-      inventory.splice(i,1);
-      save(); renderInv();
-    };
-
-    d.appendChild(sell);
+    dis.onclick=()=>{dust+=(it.d||0);inventory.splice(i,1);save();renderInv();};
+    d.appendChild(s);
     d.appendChild(dis);
     div.appendChild(d);
   });
