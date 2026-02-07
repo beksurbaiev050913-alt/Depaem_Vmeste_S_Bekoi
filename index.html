@@ -5,33 +5,70 @@
 <title>Vegas_Kazik</title>
 
 <style>
+*{box-sizing:border-box;font-family:Arial}
 body{
   margin:0;
-  font-family:Arial;
   background:radial-gradient(circle at top,#3a005f,#000);
   color:#fff;
   text-align:center;
 }
-
 h1{color:#ff5cff}
 
-button{
-  padding:6px 12px;
+nav button{
+  background:#00eaff;
+  color:#000;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
+  padding:8px 14px;
+  margin:4px;
   cursor:pointer;
-  margin:3px;
 }
-
-nav button{background:#00eaff;color:#000}
 
 .case{
   display:inline-block;
   background:#222;
   padding:15px;
-  border-radius:15px;
+  border-radius:16px;
   margin:10px;
-  width:150px;
+  width:160px;
+}
+
+.case span{font-size:32px}
+
+#roll{
+  width:90%;
+  height:120px;
+  margin:20px auto;
+  border:3px solid #fff;
+  overflow:hidden;
+  position:relative;
+  border-radius:15px;
+  display:none;
+}
+#line{
+  position:absolute;
+  left:50%;
+  top:0;
+  width:4px;
+  height:100%;
+  background:red;
+}
+#items{
+  display:flex;
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+}
+
+.rollItem{
+  width:120px;
+  margin:10px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
 }
 
 .item{
@@ -48,36 +85,15 @@ nav button{background:#00eaff;color:#000}
 .legend{background:#f1c40f;color:#000}
 
 .hidden{display:none}
-
-#roulette{
-  margin-top:20px;
-  height:80px;
-  overflow:hidden;
-}
-
-.roll{
-  display:flex;
-  justify-content:center;
-  animation: spin 1.5s ease-out forwards;
-}
-
-.roll .item{
-  margin:0 5px;
-}
-
-@keyframes spin{
-  from{transform:translateX(-400px)}
-  to{transform:translateX(0)}
-}
 </style>
 </head>
 
 <body>
 
-<h1>Бека депает — и ты депай!</h1>
+<h1>🎰 Vegas_Kazik</h1>
 <div>
-  Баланс: <b id="cc">2000</b> CC |
-  Пыль: <b id="dust">0</b>
+  Баланс: <b id="cc"></b> CC |
+  Пыль: <b id="dust"></b>
 </div>
 
 <nav>
@@ -86,54 +102,46 @@ nav button{background:#00eaff;color:#000}
 </nav>
 
 <div id="cases">
-  <div class="case">
-    <b>Новичок</b><br>100 CC<br>
-    <button onclick="openCase('starter')">Открыть</button>
-  </div>
+  <div class="case"><span>📦</span><br>Новичок<br>100 CC<br><button onclick="openCase('starter')">Открыть</button></div>
+  <div class="case"><span>🧊</span><br>Стандарт<br>300 CC<br><button onclick="openCase('standard')">Открыть</button></div>
+  <div class="case"><span>💎</span><br>Дубай<br>600 CC<br><button onclick="openCase('dubai')">Открыть</button></div>
+  <div class="case"><span>🌫️</span><br>Пыльный<br>5000 пыли<br><button onclick="openCase('dusty')">Открыть</button></div>
 
-  <div class="case">
-    <b>Стандарт</b><br>300 CC<br>
-    <button onclick="openCase('standard')">Открыть</button>
-  </div>
-
-  <div class="case">
-    <b>Дубай</b><br>600 CC<br>
-    <button onclick="openCase('dubai')">Открыть</button>
-  </div>
-
-  <div class="case">
-    <b>Пыльный</b><br>5000 пыли<br>
-    <button onclick="openCase('dusty')">Открыть</button>
+  <div id="roll">
+    <div id="line"></div>
+    <div id="items"></div>
   </div>
 </div>
 
-<div id="roulette" class="hidden"></div>
 <div id="inv" class="hidden"></div>
 
 <script>
 let cc = Number(localStorage.getItem("cc")) || 2000;
 let dust = Number(localStorage.getItem("dust")) || 0;
-let inventory = JSON.parse(localStorage.getItem("inv")) || [];
+let inv = JSON.parse(localStorage.getItem("inv")) || [];
 
-const prices = {
+const prices={
   starter:{cc:100},
   standard:{cc:300},
   dubai:{cc:600},
   dusty:{dust:5000}
 };
 
-const loot = {
+const loot={
   starter:[
-    {n:"Книга",r:"blue",p:100,d:90},
-    {n:"Шапка",r:"epic",p:300,d:370}
+    {n:"Блокнот",r:"blue",p:230,d:230},
+    {n:"Флешка",r:"blue",p:230,d:230},
+    {n:"Шапка",r:"epic",p:370,d:370}
   ],
   standard:[
+    {n:"Мышка",r:"blue",p:230,d:230},
     {n:"Кроссовок",r:"epic",p:370,d:370},
-    {n:"Остров",r:"mythic",p:780,d:780}
+    {n:"Остров",r:"mythic",p:3500,d:780}
   ],
   dubai:[
-    {n:"Квартира Бишкек",r:"mythic",p:780,d:780},
-    {n:"Золотая медаль",r:"legend",p:1100,d:1300}
+    {n:"Очки",r:"epic",p:370,d:370},
+    {n:"Квартира Бишкек",r:"mythic",p:3500,d:780},
+    {n:"Золотая медаль",r:"legend",p:11600,d:1300}
   ],
   dusty:[
     {n:"Золотая чаша",r:"legend",p:11600},
@@ -142,9 +150,9 @@ const loot = {
     {n:"Золотой клык",r:"legend",p:11600},
     {n:"Галстук Беки",r:"legend",p:11600},
     {n:"Серебряный кроссовок",r:"mythic",p:3500},
-    {n:"Кроссовок",r:"mythic",p:3500},
     {n:"Книга по математике",r:"mythic",p:3500},
     {n:"Шаурма",r:"mythic",p:3500},
+    {n:"Кроссовок",r:"mythic",p:3500},
     {n:"Квартира в центре Бишкека",r:"mythic",p:3500}
   ]
 };
@@ -152,66 +160,78 @@ const loot = {
 function save(){
   localStorage.setItem("cc",cc);
   localStorage.setItem("dust",dust);
-  localStorage.setItem("inv",JSON.stringify(inventory));
+  localStorage.setItem("inv",JSON.stringify(inv));
   document.getElementById("cc").innerText=cc;
   document.getElementById("dust").innerText=dust;
 }
 
 function show(id){
-  ["cases","inv","roulette"].forEach(x=>{
-    document.getElementById(x).classList.add("hidden");
-  });
+  document.getElementById("cases").classList.add("hidden");
+  document.getElementById("inv").classList.add("hidden");
   document.getElementById(id).classList.remove("hidden");
   if(id==="inv") renderInv();
 }
 
 function openCase(type){
-  let price = prices[type];
-  if(price.cc && cc < price.cc) return alert("Недостаточно CC");
-  if(price.dust && dust < price.dust) return alert("Недостаточно пыли");
+  let price=prices[type];
+  if(price.cc && cc<price.cc) return alert("Мало CC");
+  if(price.dust && dust<price.dust) return alert("Мало пыли");
 
-  if(price.cc) cc -= price.cc;
-  if(price.dust) dust -= price.dust;
-  save();
+  if(price.cc) cc-=price.cc;
+  if(price.dust) dust-=price.dust;
 
-  show("roulette");
-  let r = document.getElementById("roulette");
-  r.innerHTML = "<div class='roll'></div>";
-  let roll = r.firstChild;
+  let pool=loot[type];
+  let win=pool[Math.floor(Math.random()*pool.length)];
 
-  let pool = loot[type];
-  let real = pool[Math.floor(Math.random()*pool.length)];
+  let roll=document.getElementById("roll");
+  let items=document.getElementById("items");
+  items.innerHTML="";
+  roll.style.display="block";
+  items.style.left="0px";
+  items.style.transition="none";
 
-  for(let i=0;i<8;i++){
-    let fake = pool[Math.floor(Math.random()*pool.length)];
-    roll.innerHTML += `<div class="item ${fake.r}">${fake.n}</div>`;
+  for(let i=0;i<20;i++){
+    let it=pool[Math.floor(Math.random()*pool.length)];
+    items.innerHTML+=`<div class="rollItem ${it.r}">${it.n}</div>`;
   }
-  roll.innerHTML += `<div class="item ${real.r}"><b>${real.n}</b></div>`;
 
   setTimeout(()=>{
-    inventory.push(real);
+    items.style.transition="left 3s ease";
+    items.style.left="-1600px";
+  },50);
+
+  setTimeout(()=>{
+    inv.push(win);
     save();
-    alert("Ты выбил: "+real.n);
-    show("inv");
-  },1500);
+    roll.style.display="none";
+    alert("🎉 Ты выбил: "+win.n);
+  },3100);
 }
 
 function renderInv(){
-  let div = document.getElementById("inv");
-  div.innerHTML="";
-  inventory.forEach((it,i)=>{
-    let d=document.createElement("div");
-    d.className="item "+it.r;
-    d.innerHTML=`<b>${it.n}</b><br>${it.p} CC<br>`;
+  let d=document.getElementById("inv");
+  d.innerHTML="";
+  inv.forEach((it,i)=>{
+    let e=document.createElement("div");
+    e.className="item "+it.r;
+    e.innerHTML=`<b>${it.n}</b><br>${it.p} CC<br>`;
     let s=document.createElement("button");
     s.innerText="Продать";
-    s.onclick=()=>{cc+=it.p;inventory.splice(i,1);save();renderInv();};
+    s.onclick=()=>{
+      cc+=it.p;
+      inv.splice(i,1);
+      save();renderInv();
+    };
     let dis=document.createElement("button");
     dis.innerText="Распылить";
-    dis.onclick=()=>{dust+=(it.d||0);inventory.splice(i,1);save();renderInv();};
-    d.appendChild(s);
-    d.appendChild(dis);
-    div.appendChild(d);
+    dis.onclick=()=>{
+      dust+=it.d||0;
+      inv.splice(i,1);
+      save();renderInv();
+    };
+    e.appendChild(s);
+    e.appendChild(dis);
+    d.appendChild(e);
   });
 }
 
