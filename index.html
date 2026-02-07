@@ -8,7 +8,8 @@
 *{box-sizing:border-box;font-family:Segoe UI,sans-serif}
 body{margin:0;background:radial-gradient(circle at top,#2a0040,#000);color:#fff}
 header{text-align:center;padding:20px;font-size:32px;font-weight:900;color:#ff4dff;text-shadow:0 0 15px #ff4dff}
-#stats{text-align:center;margin-bottom:10px;font-size:18px}
+
+#stats{text-align:center;font-size:18px;margin-bottom:10px}
 
 nav{display:flex;justify-content:center;gap:10px;background:#140020;padding:10px}
 nav button{border:2px solid #00f7ff;background:none;color:#fff;padding:10px 16px;border-radius:20px;cursor:pointer}
@@ -19,13 +20,28 @@ nav button:hover{background:#00f7ff;color:#000}
 
 .cases{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
 .case{width:220px;padding:15px;border-radius:20px;text-align:center}
-.case .emoji{font-size:40px}
+.case .emoji{font-size:42px}
 .case button{margin-top:8px;width:100%;padding:8px;border:none;border-radius:15px;font-weight:bold;cursor:pointer}
 
 .bronze{background:#a97142}
 .silver{background:#5dade2}
 .gold{background:#f1c40f;color:#000}
 .dust{background:#7f8c8d}
+
+#rollBox{
+width:90%;height:140px;margin:30px auto;
+border:3px solid #fff;border-radius:20px;
+overflow:hidden;display:none;position:relative
+}
+#rollLine{position:absolute;left:50%;top:0;width:4px;height:100%;background:red;z-index:5}
+#rollItems{display:flex;position:absolute;height:100%;left:0}
+.rollItem{
+width:140px;margin:10px;border-radius:15px;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+font-weight:bold;text-align:center
+}
+.rollItem span{font-size:34px}
+.win{outline:4px solid gold;box-shadow:0 0 25px gold;transform:scale(1.1)}
 
 .inventory{display:flex;gap:15px;flex-wrap:wrap;justify-content:center}
 .item{width:200px;padding:15px;border-radius:20px;text-align:center}
@@ -54,63 +70,65 @@ nav button:hover{background:#00f7ff;color:#000}
 <button onclick="show('inv')">Мои герои</button>
 </nav>
 
-<!-- КЕЙСЫ -->
 <div id="cases" class="section active">
 <div class="cases">
 
 <div class="case bronze">
-<div class="emoji">📦</div>
-<h3>Новичок</h3>
-<p>90 CC</p>
-<button onclick="openCase('basic')">Открыть</button>
+<div class="emoji">📦</div><h3>Новичок</h3><p>90 CC</p>
+<button onclick="openCase('basic',90)">Открыть</button>
 </div>
 
 <div class="case silver">
-<div class="emoji">🧊</div>
-<h3>Стандарт</h3>
-<p>230 CC</p>
-<button onclick="openCase('standard')">Открыть</button>
+<div class="emoji">🧊</div><h3>Стандарт</h3><p>230 CC</p>
+<button onclick="openCase('standard',230)">Открыть</button>
 </div>
 
 <div class="case gold">
-<div class="emoji">💎</div>
-<h3>Дубай</h3>
-<p>499 CC</p>
-<button onclick="openCase('dubai')">Открыть</button>
+<div class="emoji">💎</div><h3>Дубай</h3><p>499 CC</p>
+<button onclick="openCase('dubai',499)">Открыть</button>
 </div>
 
 <div class="case dust">
-<div class="emoji">💨</div>
-<h3>Пыльный</h3>
-<p>5000 пыли</p>
-<button onclick="openDust(1)">Открыть ×1</button>
-<button onclick="openDust(10)">Открыть ×10</button>
+<div class="emoji">💨</div><h3>Пыльный</h3><p>5000 пыли</p>
+<button onclick="openDust(1)">×1</button>
+<button onclick="openDust(10)">×10</button>
 </div>
 
 </div>
+
+<div id="rollBox">
+<div id="rollLine"></div>
+<div id="rollItems"></div>
+</div>
 </div>
 
-<!-- ИНВЕНТАРЬ -->
 <div id="inv" class="section">
 <div class="inventory" id="inventory"></div>
 </div>
 
 <script>
-let coins = +localStorage.getItem("coins") || 1800;
-let dust = +localStorage.getItem("dust") || 0;
-let inv = JSON.parse(localStorage.getItem("inv")) || [];
+let coins=+localStorage.getItem("coins")||1800;
+let dust=+localStorage.getItem("dust")||0;
+let inv=JSON.parse(localStorage.getItem("inv"))||[];
 
-const prices = {
-gray:90, green:160, blue:230, epic:370, mythic:780, legend:1300
+const values={
+gray:{cc:70,dust:90},
+green:{cc:170,dust:160},
+blue:{cc:270,dust:230},
+epic:{cc:370,dust:370},
+mythic:{cc:550,dust:780},
+legend:{cc:7000,dust:1300}
 };
 
-const loot = {
+const loot={
 basic:[
-["Мышка","🖱️","gray"],["Цветок","🌸","green"],["Телефон","📱","blue"],["Шуба","🧥","epic"]
+["Мышка","🖱️","gray"],["Цветок","🌸","green"],
+["Телефон","📱","blue"],["Шуба","🧥","epic"]
 ],
 standard:[
-["Мышка","🖱️","gray"],["Кот","🐱","green"],["Ноут","💻","blue"],
-["Остров","🏝️","epic"],["Кроссовки","👟","mythic"],["Золотая медаль","🥇","legend"]
+["Кот","🐱","green"],["Ноут","💻","blue"],
+["Остров","🏝️","epic"],["Кроссовки","👟","mythic"],
+["Золотая медаль","🥇","legend"]
 ],
 dubai:[
 ["Телефон","📱","blue"],["Шуба","🧥","epic"],
@@ -118,7 +136,7 @@ dubai:[
 ]
 };
 
-const dustLoot = {
+const dustLoot={
 legend:[
 ["Золотая чаша","🏆"],["Золотая медаль","🥇"],
 ["Золотая кепка Беки","🧢"],["Золотой клык","🦷"],["Галстук Беки","👔"]
@@ -129,34 +147,54 @@ mythic:[
 ]
 };
 
-function roll(caseType){
+function roll(type){
 let r=Math.random()*100;
-if(caseType==="basic"){
-if(r<45)return 0;if(r<75)return 1;if(r<95)return 2;return 3;
-}
-if(caseType==="standard"){
-if(r<30)return 0;if(r<55)return 1;if(r<80)return 2;if(r<95)return 3;if(r<99)return 4;return 5;
-}
-if(caseType==="dubai"){
-if(r<35)return 2;if(r<65)return 3;if(r<92)return 4;return 5;
-}
+if(type==="basic"){if(r<45)return 0;if(r<75)return 1;if(r<95)return 2;return 3;}
+if(type==="standard"){if(r<35)return 0;if(r<65)return 1;if(r<85)return 2;if(r<97)return 3;return 4;}
+if(type==="dubai"){if(r<40)return 0;if(r<70)return 1;if(r<92)return 2;return 3;}
 }
 
-function openCase(type){
-const cost={basic:90,standard:230,dubai:499}[type];
-if(coins<cost)return alert("Недостаточно CC");
-coins-=cost;
-const item=loot[type][roll(type)];
-inv.push({n:item[0],e:item[1],r:item[2]});
-save();alert("🎉 "+item[1]+" "+item[0]);
+function openCase(type,price){
+if(coins<price)return alert("Недостаточно CC");
+coins-=price;save();
+
+const win=loot[type][roll(type)];
+animate(win);
+}
+
+function animate(win){
+const box=document.getElementById("rollBox");
+const items=document.getElementById("rollItems");
+items.innerHTML="";
+box.style.display="block";
+items.style.transition="none";
+items.style.left="0px";
+
+for(let i=0;i<20;i++){
+let r=loot.standard[Math.floor(Math.random()*loot.standard.length)];
+items.innerHTML+=`<div class="rollItem ${r[2]}"><span>${r[1]}</span>${r[0]}</div>`;
+}
+items.innerHTML+=`<div class="rollItem ${win[2]} win"><span>${win[1]}</span>${win[0]}</div>`;
+
+setTimeout(()=>{
+items.style.transition="left 3s cubic-bezier(.1,.9,.2,1)";
+items.style.left="-2400px";
+},100);
+
+setTimeout(()=>{
+inv.push({n:win[0],e:win[1],r:win[2]});
+save();
+alert("🎉 Ты выбил: "+win[1]+" "+win[0]);
+box.style.display="none";
+},3200);
 }
 
 function openDust(x){
 if(dust<5000*x)return alert("Недостаточно пыли");
 dust-=5000*x;
 for(let i=0;i<x;i++){
-dustLoot.legend.forEach(i=>inv.push({n:i[0],e:i[1],r:"legend"}));
-dustLoot.mythic.forEach(i=>inv.push({n:i[0],e:i[1],r:"mythic"}));
+dustLoot.legend.forEach(l=>inv.push({n:l[0],e:l[1],r:"legend"}));
+dustLoot.mythic.forEach(m=>inv.push({n:m[0],e:m[1],r:"mythic"}));
 }
 save();alert("💨 Пыльный кейс открыт!");
 }
@@ -169,11 +207,17 @@ el.innerHTML="";
 inv.forEach((i,idx)=>{
 let d=document.createElement("div");
 d.className="item "+i.r;
-d.innerHTML=`<span>${i.e}</span><b>${i.n}</b><br>${prices[i.r]} пыли`;
-let b=document.createElement("button");
-b.innerText="Распылить";
-b.onclick=()=>{dust+=prices[i.r];inv.splice(idx,1);save();};
-d.appendChild(b);el.appendChild(d);
+d.innerHTML=`<span>${i.e}</span><b>${i.n}</b>
+<br>💰 ${values[i.r].cc} CC
+<br>💨 ${values[i.r].dust} пыли`;
+let sell=document.createElement("button");
+sell.innerText="Продать";
+sell.onclick=()=>{coins+=values[i.r].cc;inv.splice(idx,1);save();};
+let dis=document.createElement("button");
+dis.innerText="Распылить";
+dis.onclick=()=>{dust+=values[i.r].dust;inv.splice(idx,1);save();};
+d.appendChild(sell);d.appendChild(dis);
+el.appendChild(d);
 });
 }
 
