@@ -3,151 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <title>Кейсы Беки</title>
-<style>
-body {
-  background: radial-gradient(circle, #3a005f, #12001f);
-  color: white;
-  font-family: Arial;
-  margin: 0;
-}
-header {
-  text-align: center;
-  padding: 20px;
-}
-button {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
-.case {
-  background: #222;
-  padding: 15px;
-  border-radius: 15px;
-  margin: 10px;
-  display: inline-block;
-}
-#heroes {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
-  gap: 10px;
-  padding: 15px;
-}
-.card {
-  padding: 10px;
-  border-radius: 12px;
-  text-align: center;
-}
-.common { background:#e67e22; }
-.rare { background:#9b59b6; }
-.legend { background:#f1c40f; color:black; }
 
-.opening {
-  animation: pop 0.6s ease;
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:radial-gradient(circle at top,#3a005f,#000);
+  color:#fff;
+  text-align:center;
 }
-@keyframes pop {
-  0% { transform: scale(0.5); opacity:0; }
-  100% { transform: scale(1); opacity:1; }
+
+h1{color:#ff5cff}
+
+button{
+  padding:6px 12px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  margin:3px;
 }
+
+nav button{background:#00eaff;color:#000}
+
+.case{
+  display:inline-block;
+  background:#222;
+  padding:15px;
+  border-radius:15px;
+  margin:10px;
+  width:140px;
+}
+
+.item{
+  display:inline-block;
+  width:160px;
+  margin:8px;
+  padding:10px;
+  border-radius:15px;
+}
+
+.blue{background:#3498db}
+.epic{background:#9b59b6}
+.mythic{background:#e67e22}
+.legend{background:#f1c40f;color:#000}
+
+.hidden{display:none}
 </style>
 </head>
+
 <body>
 
-<header>
 <h1>Бека депает — и ты депай!</h1>
-<p>Баланс: <span id="money">2000</span> CC | Пыль: <span id="dust">0</span></p>
-</header>
+<div>
+  Баланс: <b id="cc">2000</b> CC |
+  Пыль: <b id="dust">0</b>
+</div>
 
-<div style="text-align:center">
-  <div class="case"><b>Новичок</b><br><button onclick="openCase('starter',1)">Открыть</button></div>
-  <div class="case"><b>Стандарт</b><br><button onclick="openCase('standard',1)">Открыть</button></div>
-  <div class="case"><b>Дубай</b><br><button onclick="openCase('dubai',1)">Открыть</button></div>
-  <div class="case"><b>Пыльный</b><br>
-    <button onclick="openCase('dusty',1)">x1</button>
-    <button onclick="openCase('dusty',10)">x10</button>
+<nav>
+  <button onclick="show('cases')">Кейсы</button>
+  <button onclick="show('inv')">Мои герои</button>
+</nav>
+
+<!-- КЕЙСЫ -->
+<div id="cases">
+  <div class="case">
+    <b>Новичок</b><br>100 CC<br>
+    <button onclick="openCase('starter')">Открыть</button>
+  </div>
+
+  <div class="case">
+    <b>Стандарт</b><br>300 CC<br>
+    <button onclick="openCase('standard')">Открыть</button>
+  </div>
+
+  <div class="case">
+    <b>Дубай</b><br>600 CC<br>
+    <button onclick="openCase('dubai')">Открыть</button>
+  </div>
+
+  <div class="case">
+    <b>Пыльный</b><br>5000 пыли<br>
+    <button onclick="openCase('dusty')">Открыть</button>
   </div>
 </div>
 
-<h2 style="text-align:center">Мои герои</h2>
-<div id="heroes"></div>
+<!-- ИНВЕНТАРЬ -->
+<div id="inv" class="hidden"></div>
 
 <script>
-let money = 2000;
-let dust = 0;
-let heroes = [];
-let uid = 0;
+let cc = Number(localStorage.getItem("cc")) || 2000;
+let dust = Number(localStorage.getItem("dust")) || 0;
+let inventory = JSON.parse(localStorage.getItem("inv")) || [];
 
-const cases = {
-  starter: [
-    {name:"Книга", type:"common", sell:50, dust:5, chance:70},
-    {name:"Кроссовок", type:"rare", sell:150, dust:15, chance:25},
-    {name:"Шапка", type:"legend", sell:400, dust:40, chance:5}
+const prices = {
+  starter:{cc:100},
+  standard:{cc:300},
+  dubai:{cc:600},
+  dusty:{dust:5000}
+};
+
+const loot = {
+  starter:[
+    {n:"Книга",r:"blue",p:100,d:90},
+    {n:"Шапка",r:"epic",p:300,d:370}
   ],
-  standard: [
-    {name:"Шаурма", type:"common", sell:100, dust:10, chance:65},
-    {name:"Кроссовок", type:"rare", sell:300, dust:30, chance:30},
-    {name:"Остров", type:"legend", sell:780, dust:80, chance:5}
+  standard:[
+    {n:"Кроссовок",r:"epic",p:370,d:370},
+    {n:"Остров",r:"mythic",p:780,d:780}
   ],
-  dubai: [
-    {name:"Квартира Бишкек", type:"rare", sell:600, dust:60, chance:85},
-    {name:"Золотая медаль", type:"legend", sell:1100, dust:120, chance:15}
+  dubai:[
+    {n:"Золотая медаль",r:"legend",p:1100,d:1300},
+    {n:"Квартира Бишкек",r:"mythic",p:780,d:780}
   ],
-  dusty: [
-    {name:"Пыль", type:"common", sell:0, dust:20, chance:90},
-    {name:"Шапка", type:"rare", sell:300, dust:40, chance:9},
-    {name:"Золотой клык", type:"legend", sell:1100, dust:150, chance:1}
+  dusty:[
+    {n:"Золотая чаша",r:"legend",p:11600},
+    {n:"Золотая медаль",r:"legend",p:11600},
+    {n:"Золотая кепка Беки",r:"legend",p:11600},
+    {n:"Золотой клык",r:"legend",p:11600},
+    {n:"Галстук Беки",r:"legend",p:11600},
+    {n:"Серебряный кроссовок",r:"mythic",p:3500},
+    {n:"Кроссовок",r:"mythic",p:3500},
+    {n:"Книга по математике",r:"mythic",p:3500},
+    {n:"Шаурма",r:"mythic",p:3500},
+    {n:"Квартира в центре Бишкека",r:"mythic",p:3500}
   ]
 };
 
-function roll(items) {
-  let r = Math.random()*100;
-  let sum = 0;
-  for (let i of items) {
-    sum += i.chance;
-    if (r <= sum) return {...i};
-  }
+function save(){
+  localStorage.setItem("cc",cc);
+  localStorage.setItem("dust",dust);
+  localStorage.setItem("inv",JSON.stringify(inventory));
+  document.getElementById("cc").innerText=cc;
+  document.getElementById("dust").innerText=dust;
 }
 
-function openCase(type, count) {
-  for (let i=0;i<count;i++) {
-    const item = roll(cases[type]);
-    item.id = uid++;
-    heroes.push(item);
-    setTimeout(renderHeroes, 200);
-  }
+function show(id){
+  document.getElementById("cases").classList.add("hidden");
+  document.getElementById("inv").classList.add("hidden");
+  document.getElementById(id).classList.remove("hidden");
+  renderInv();
 }
 
-function renderHeroes() {
-  const box = document.getElementById("heroes");
-  box.innerHTML = "";
-  heroes.forEach(h=>{
-    const d = document.createElement("div");
-    d.className = `card ${h.type} opening`;
-    d.innerHTML = `
-      <b>${h.name}</b><br>
-      ${h.sell} CC<br>
-      <button onclick="sell(${h.id})">Продать</button>
-      <button onclick="dustItem(${h.id})">Распылить</button>
-    `;
-    box.appendChild(d);
+function openCase(type){
+  let price = prices[type];
+
+  if(price.cc && cc < price.cc) return alert("Недостаточно CC");
+  if(price.dust && dust < price.dust) return alert("Недостаточно пыли");
+
+  if(price.cc) cc -= price.cc;
+  if(price.dust) dust -= price.dust;
+
+  let pool = loot[type];
+  let item = pool[Math.floor(Math.random()*pool.length)];
+  inventory.push(item);
+
+  save();
+  alert("Ты выбил: "+item.n);
+}
+
+function renderInv(){
+  let div = document.getElementById("inv");
+  div.innerHTML="";
+
+  inventory.forEach((it,i)=>{
+    let d = document.createElement("div");
+    d.className="item "+it.r;
+    d.innerHTML=`<b>${it.n}</b><br>${it.p} CC<br>`;
+
+    let sell = document.createElement("button");
+    sell.innerText="Продать";
+    sell.onclick=()=>{
+      cc+=it.p;
+      inventory.splice(i,1);
+      save(); renderInv();
+    };
+
+    let dis = document.createElement("button");
+    dis.innerText="Распылить";
+    dis.onclick=()=>{
+      dust+=(it.d||0);
+      inventory.splice(i,1);
+      save(); renderInv();
+    };
+
+    d.appendChild(sell);
+    d.appendChild(dis);
+    div.appendChild(d);
   });
-  document.getElementById("money").textContent = money;
-  document.getElementById("dust").textContent = dust;
 }
 
-function sell(id){
-  const i = heroes.findIndex(h=>h.id===id);
-  money += heroes[i].sell;
-  heroes.splice(i,1);
-  renderHeroes();
-}
-function dustItem(id){
-  const i = heroes.findIndex(h=>h.id===id);
-  dust += heroes[i].dust;
-  heroes.splice(i,1);
-  renderHeroes();
-}
+save();
 </script>
-
 </body>
 </html>
