@@ -2,317 +2,132 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Beka-Depaet-BezOstanovki</title>
-
+<title>Vegas_Kazik</title>
 <style>
 *{box-sizing:border-box;font-family:Segoe UI,sans-serif}
-body{
-  margin:0;
-  background:radial-gradient(circle at top,#2a0040,#000);
-  color:#fff;
-}
-header{
-  text-align:center;
-  padding:20px;
-  font-size:30px;
-  font-weight:900;
-  color:#ff4dff;
-  text-shadow:0 0 15px #ff4dff;
-}
-#balance{text-align:center;font-size:20px;margin-bottom:10px}
-
-nav{
-  display:flex;
-  justify-content:center;
-  gap:15px;
-  background:#140020;
-  padding:10px;
-}
-nav button{
-  border:2px solid #00f7ff;
-  background:none;
-  color:#fff;
-  padding:10px 18px;
-  border-radius:25px;
-  cursor:pointer;
-}
+body{margin:0;background:radial-gradient(circle at top,#2a0040,#000);color:#fff}
+header{text-align:center;padding:20px;font-size:32px;font-weight:900;color:#ff4dff;text-shadow:0 0 15px #ff4dff}
+#balance{text-align:center;font-size:18px;margin-bottom:10px}
+nav{display:flex;justify-content:center;gap:15px;background:#140020;padding:10px}
+nav button{border:2px solid #00f7ff;background:none;color:#fff;padding:8px 18px;border-radius:25px;cursor:pointer}
 nav button:hover{background:#00f7ff;color:#000}
-
 .section{display:none;padding:20px}
 .section.active{display:block}
-
-/* ---------- CASES ---------- */
-.cases{
-  display:flex;
-  gap:30px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-.case{
-  width:230px;
-  padding:20px;
-  border-radius:25px;
-  text-align:center;
-}
-.case .emoji{font-size:48px}
-.case button{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:20px;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-}
-
+.cases{display:flex;gap:25px;justify-content:center;flex-wrap:wrap}
+.case{width:220px;padding:18px;border-radius:25px;text-align:center}
+.case .emoji{font-size:42px}
+.case button{width:100%;margin-top:10px;padding:10px;border-radius:20px;border:none;font-weight:bold;cursor:pointer}
 .bronze{background:linear-gradient(145deg,#8b5a2b,#c68642)}
 .silverCase{background:linear-gradient(145deg,#9aa7b2,#4facfe)}
 .gold{background:linear-gradient(145deg,#ffd700,#ff9900);color:#000}
 .spring{background:linear-gradient(145deg,#2ecc71,#a3ffcb);color:#000}
-
-/* ---------- ROLL ---------- */
-#roll{
-  margin:30px auto;
-  width:90%;
-  height:140px;
-  border:3px solid #fff;
-  overflow:hidden;
-  position:relative;
-  display:none;
-  border-radius:20px;
-}
-#rollLine{
-  position:absolute;
-  left:50%;
-  top:0;
-  width:4px;
-  height:100%;
-  background:red;
-  z-index:5;
-}
-#rollItems{
-  display:flex;
-  position:absolute;
-  height:100%;
-}
-.rollItem{
-  width:140px;
-  margin:10px;
-  border-radius:15px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-}
-.rollItem span{font-size:34px}
-.win{outline:4px solid gold;box-shadow:0 0 25px gold}
-
-/* ---------- INVENTORY ---------- */
-.inventory{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-  justify-content:center;
-}
-.item{
-  width:220px;
-  padding:15px;
-  border-radius:20px;
-  text-align:center;
-}
+.inventory{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.item{width:220px;padding:15px;border-radius:20px;text-align:center}
 .item span{font-size:40px}
-.item small{display:block;margin:6px 0;opacity:.9}
-.item button{
-  width:100%;
-  padding:8px;
-  border:none;
-  border-radius:15px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
+.item button{width:100%;padding:8px;border:none;border-radius:15px;cursor:pointer;font-weight:bold}
 .silver{background:#aaa}
 .green{background:#2ecc71}
 .blue{background:#3498db}
 .epic{background:#9b59b6}
 .mythic{background:#e74c3c}
 .legend{background:#f1c40f;color:#000}
-
-/* ---------- BLACK PASS ---------- */
-.pass{
-  max-width:800px;
-  margin:auto;
-}
-.pass-header{
-  text-align:center;
-  font-size:26px;
-  margin-bottom:15px;
-  color:#00f7ff;
-}
-.pass-level{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#1c0030;
-  padding:12px 18px;
-  border-radius:20px;
-  margin-bottom:12px;
-}
-.pass-level.locked{opacity:.4}
-.pass-level button{
-  padding:6px 14px;
-  border:none;
-  border-radius:14px;
-  cursor:pointer;
-  font-weight:bold;
-}
-.free{color:#fff}
-.premium{color:#ffd700}
+.passLevel{background:#1b0030;border-radius:20px;padding:15px;margin:15px 0;display:flex;justify-content:space-between;align-items:center}
+.passLevel.locked{opacity:.4}
+.passLevel button{padding:6px 14px;border:none;border-radius:12px;cursor:pointer;font-weight:bold}
+.progress{width:80%;height:12px;background:#333;border-radius:10px;margin:10px auto;overflow:hidden}
+.progress div{height:100%;background:#00f7ff;width:0%}
 </style>
 </head>
-
 <body>
-
 <header>Бека депает — и ты депай!</header>
-<div id="balance">Баланс: <span id="coins">1800</span> CC</div>
-
+<div id="balance">Баланс: <b id="coins">2000</b> CC</div>
 <nav>
-  <button onclick="show('cases')">Кейсы</button>
-  <button onclick="show('inventory')">Мои герои</button>
-  <button onclick="show('pass')">Black Pass</button>
+<button onclick="show('cases')">Кейсы</button>
+<button onclick="show('inventory')">Мои герои</button>
+<button onclick="show('pass')">Black Pass</button>
 </nav>
 
-<!-- ---------- CASES ---------- -->
 <div id="cases" class="section active">
-  <div class="cases">
-    <div class="case bronze">
-      <div class="emoji">📦</div>
-      <h3>Новичок</h3>
-      <p>90 CC</p>
-      <button onclick="openCase('novice',90)">Открыть</button>
-    </div>
-    <div class="case silverCase">
-      <div class="emoji">🧊</div>
-      <h3>Стандартный</h3>
-      <p>230 CC</p>
-      <button onclick="openCase('standard',230)">Открыть</button>
-    </div>
-    <div class="case gold">
-      <div class="emoji">💎</div>
-      <h3>Дубайский</h3>
-      <p>499 CC</p>
-      <button onclick="openCase('dubai',499)">Открыть</button>
-    </div>
-    <div class="case spring">
-      <div class="emoji">🌸</div>
-      <h3>Весенний</h3>
-      <p>699 CC</p>
-      <button onclick="openCase('spring',699)">Открыть</button>
-    </div>
-  </div>
-
-  <div id="roll">
-    <div id="rollLine"></div>
-    <div id="rollItems"></div>
-  </div>
+<div class="cases">
+<div class="case bronze"><div class="emoji">📦</div><h3>Новичок</h3><p>90 CC</p><button onclick="openCase('novice',90)">Открыть</button></div>
+<div class="case silverCase"><div class="emoji">🧊</div><h3>Стандарт</h3><p>230 CC</p><button onclick="openCase('standard',230)">Открыть</button></div>
+<div class="case gold"><div class="emoji">💎</div><h3>Дубай</h3><p>499 CC</p><button onclick="openCase('dubai',499)">Открыть</button></div>
+<div class="case spring"><div class="emoji">🌸</div><h3>Весенний</h3><p>699 CC</p><button onclick="openCase('spring',699)">Открыть</button></div>
+</div>
 </div>
 
-<!-- ---------- INVENTORY ---------- -->
-<div id="inventory" class="section">
-  <div class="inventory" id="inv"></div>
-</div>
+<div id="inventory" class="section"><div class="inventory" id="inv"></div></div>
 
-<!-- ---------- BLACK PASS ---------- -->
 <div id="pass" class="section">
-  <div class="pass">
-    <div class="pass-header">🔥 Black Pass</div>
-    <div id="passLevels"></div>
-    <button onclick="buyPremium()">💎 Купить Premium Pass (999 CC)</button>
-  </div>
+<h2 style="text-align:center">🔥 Black Pass</h2>
+<div class="progress"><div id="xpBar"></div></div>
+<div style="text-align:center">Уровень: <b id="passLvl">1</b> | XP: <b id="xp">0</b>/100</div>
+<div id="passList"></div>
+<div style="text-align:center;margin-top:15px">
+<button onclick="buyPremium()">Купить Premium Pass (13000 CC)</button>
+<button onclick="buyDeluxe()">Premium Deluxe (23000 CC)</button>
+</div>
 </div>
 
 <script>
-let coins = Number(localStorage.getItem("coins")) || 1800;
-let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
-let passLevel = Number(localStorage.getItem("passLevel")) || 1;
-let premium = localStorage.getItem("premium")==="1";
+let coins=Number(localStorage.getItem('coins'))||2000;
+let inventory=JSON.parse(localStorage.getItem('inv'))||[];
+let xp=Number(localStorage.getItem('xp'))||0;
+let level=Number(localStorage.getItem('level'))||1;
+let premium=localStorage.getItem('premium')==='1';
+let deluxe=localStorage.getItem('deluxe')==='1';
 
-const coinsEl=document.getElementById("coins");
-const inv=document.getElementById("inv");
+const prices={silver:70,green:170,blue:270,epic:370,mythic:800,legend:7000};
+const items={
+silver:[{n:'Мишка',e:'🧸'}],
+green:[{n:'Мышка',e:'🖱️'}],
+blue:[{n:'Телефон',e:'📱'}],
+epic:[{n:'Шуба',e:'🧥'},{n:'Венок',e:'🌿'}],
+mythic:[{n:'Кроссовки',e:'👟'}],
+legend:[{n:'Золотая чаша',e:'🏆'},{n:'Золотая швабра',e:'🧹'}]
+};
 
 const passRewards=[
- {free:"+100 CC",premium:"Стандартный кейс"},
- {free:"Новичок кейс",premium:"+300 CC"},
- {free:"+200 CC",premium:"Дубайский кейс"},
- {free:"Эпик предмет",premium:"Весенний кейс"}
+{free:{cc:100},prem:{cc:300}},
+{free:{case:'novice'},prem:{case:'standard'}},
+{free:{cc:200},prem:{case:'dubai'}},
+{free:{item:'epic'},prem:{item:'mythic'}},
+{free:{cc:300},prem:{cc:500}},
+{free:{case:'standard'},prem:{item:'epic'}},
+{free:{cc:200},prem:{case:'dubai'}},
+{free:{item:'blue'},prem:{item:'epic'}},
+{free:{cc:300},prem:{cc:600}},
+{free:{case:'novice'},prem:{item:'mythic'}},
+{free:{cc:300},prem:{case:'standard'}},
+{free:{item:'green'},prem:{item:'epic'}},
+{free:{cc:400},prem:{cc:800}},
+{free:{case:'standard'},prem:{case:'dubai'}},
+{free:{item:'blue'},prem:{item:'mythic'}},
+{free:{cc:500},prem:{cc:1000}},
+{free:{case:'novice'},prem:{item:'epic'}},
+{free:{cc:500},prem:{case:'standard'}},
+{free:{item:'epic'},prem:{item:'mythic'}},
+{free:{item:'legend'},prem:{item:'legend'}}
 ];
 
-function save(){
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("inventory",JSON.stringify(inventory));
-  localStorage.setItem("passLevel",passLevel);
-  localStorage.setItem("premium",premium?"1":"0");
-  coinsEl.innerText=coins;
-}
+function save(){localStorage.setItem('coins',coins);localStorage.setItem('inv',JSON.stringify(inventory));localStorage.setItem('xp',xp);localStorage.setItem('level',level);document.getElementById('coins').innerText=coins;document.getElementById('xp').innerText=xp;document.getElementById('passLvl').innerText=level;document.getElementById('xpBar').style.width=(xp)+'%';}
 
-function show(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  renderInv();
-  renderPass();
-}
+function show(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');renderInv();renderPass();}
 
-/* ---------- PASS ---------- */
-function renderPass(){
-  passLevels.innerHTML="";
-  passRewards.forEach((r,i)=>{
-    let lvl=i+1;
-    let d=document.createElement("div");
-    d.className="pass-level"+(passLevel<lvl?" locked":"");
-    d.innerHTML=`
-      <div>
-        <b>Уровень ${lvl}</b><br>
-        <span class="free">🎁 ${r.free}</span><br>
-        <span class="premium">💎 ${r.premium}</span>
-      </div>
-      ${passLevel===lvl?'<button onclick="claim('+lvl+')">Забрать</button>':""}
-    `;
-    passLevels.appendChild(d);
-  });
-}
+function randItem(r){let p=items[r];return p[Math.floor(Math.random()*p.length)]}
 
-function claim(lvl){
-  if(lvl!==passLevel) return;
-  coins+=100;
-  if(premium) coins+=200;
-  passLevel++;
-  save();
-  alert("🎉 Награды получены!");
-  renderPass();
-}
+function openCase(type,price){if(coins<price)return alert('Недостаточно CC');coins-=price;let r=['silver','green','blue','epic','mythic','legend'][Math.floor(Math.random()*6)];let it=randItem(r);inventory.push({name:it.n,emoji:it.e,rarity:r});gainXP(50);save();alert('Ты выбил: '+it.e+' '+it.n)}
 
-function buyPremium(){
-  if(premium) return alert("Уже куплено");
-  if(coins<999) return alert("Не хватает CC");
-  coins-=999;
-  premium=true;
-  save();
-  alert("💎 Premium Pass активирован!");
-}
+function renderInv(){inv.innerHTML='';inventory.forEach((it,i)=>{let d=document.createElement('div');d.className='item '+it.rarity;d.innerHTML=`<span>${it.emoji}</span><b>${it.name}</b><small>${prices[it.rarity]} CC</small>`;let b=document.createElement('button');b.innerText='Продать';b.onclick=()=>{coins+=prices[it.rarity];inventory.splice(i,1);save();renderInv()};d.appendChild(b);inv.appendChild(d)})}
 
-/* ---------- INVENTORY ---------- */
-function renderInv(){
-  inv.innerHTML="";
-  inventory.forEach((it,i)=>{
-    let d=document.createElement("div");
-    d.className="item "+it.rarity;
-    d.innerHTML=`<span>${it.emoji}</span><b>${it.name}</b>`;
-    inv.appendChild(d);
-  });
-}
+function gainXP(a){xp+=a;while(xp>=100&&level<20){xp-=100;level++}save()}
 
-save();
+function renderPass(){let div=document.getElementById('passList');div.innerHTML='';passRewards.forEach((r,i)=>{let l=i+1;let box=document.createElement('div');box.className='passLevel'+(level<l?' locked':'');box.innerHTML=`<b>Уровень ${l}</b><div>🎁 Free</div><div>💎 Premium</div>`;div.appendChild(box)})}
+
+function buyPremium(){if(premium)return; if(coins<13000)return alert('Недостаточно CC');coins-=13000;premium=true;localStorage.setItem('premium','1');save()}
+function buyDeluxe(){if(deluxe)return; if(coins<23000)return alert('Недостаточно CC');coins-=23000;deluxe=true;premium=true;level=Math.min(20,level+10);localStorage.setItem('premium','1');localStorage.setItem('deluxe','1');save()}
+
+save();renderPass();
 </script>
 </body>
 </html>
