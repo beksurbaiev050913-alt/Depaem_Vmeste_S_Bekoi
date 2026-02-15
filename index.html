@@ -1,71 +1,218 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Terminated</title>
-    <style>
-        body {
-            background-color: #000;
-            color: #ff003c; /* Неоновый красно-розовый */
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            text-transform: uppercase;
-        }
+<meta charset="UTF-8">
+<title>Case Opening</title>
 
-        .container {
-            text-align: center;
-            padding: 20px;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+}
 
-        h1 {
-            font-size: 2rem;
-            letter-spacing: 5px;
-            text-shadow: 0 0 10px #ff003c, 0 0 20px #ff003c;
-            animation: blink 2s infinite;
-        }
+nav {
+    display: flex;
+    justify-content: space-around;
+    background: #1e293b;
+    padding: 10px;
+}
 
-        .subtitle {
-            color: #00f2ff; /* Циановый акцент */
-            font-size: 0.8rem;
-            margin-top: 20px;
-            opacity: 0.7;
-        }
+nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-        /* Эффект мерцания в стиле старого монитора */
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-            52% { opacity: 0.9; }
-            54% { opacity: 0.4; }
-            56% { opacity: 1; }
-        }
+.page { display: none; padding: 20px; }
+.active { display: block; }
 
-        /* Линии сканирования */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-        }
-    </style>
+.case {
+    border: 2px solid #334155;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.open {
+    padding: 10px;
+    background: #22c55e;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#roll {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    border: 2px solid white;
+    margin-top: 20px;
+    height: 80px;
+}
+
+.item {
+    min-width: 120px;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Редкости */
+.gray { background: gray; }
+.green { background: green; }
+.blue { background: blue; }
+.epic { background: purple; }
+.myth { background: red; }
+.legend { background: gold; color: black; }
+
+.inventory-item {
+    border: 1px solid #475569;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.sell {
+    background: red;
+    border: none;
+    padding: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+</style>
+
 </head>
 <body>
 
-    <div class="container">
-        <h1>Прости, но игра полностью закрыта, так как проект не удался</h1>
-        <div class="subtitle">SYSTEM_STATUS: DISCONNECTED // CORE_ERROR_404</div>
-    </div>
+<nav>
+<button onclick="showPage('cases')">Кейсы</button>
+<button onclick="showPage('inventory')">Мои герои</button>
+<button onclick="support()">Тех. поддержка</button>
+</nav>
+
+<div id="cases" class="page active">
+<h2>Кейсы</h2>
+
+<div class="case">
+<h3>🎁 Кейс Новичок</h3>
+<button class="open" onclick="startRoll()">Открыть</button>
+</div>
+
+<div id="roll"></div>
+<h3 id="result"></h3>
+
+</div>
+
+<div id="inventory" class="page">
+<h2>Мои герои</h2>
+<div id="items"></div>
+</div>
+
+<script>
+let inventory = [];
+
+const items = [
+{ name:"🍞 Хлеб", class:"gray", chance:30, price:10 },
+{ name:"🍕 Пицца", class:"green", chance:20, price:20 },
+{ name:"🎩 Шляпа", class:"blue", chance:15, price:40 },
+{ name:"🧸 Медведь", class:"blue", chance:10, price:50 },
+{ name:"🎧 Наушники", class:"epic", chance:8, price:100 },
+{ name:"💎 Алмаз", class:"epic", chance:6, price:150 },
+{ name:"🚀 Ракета", class:"myth", chance:5, price:200 },
+{ name:"👑 Корона", class:"myth", chance:3, price:400 },
+{ name:"🔥 Огненный герой", class:"legend", chance:2, price:600 },
+{ name:"🏆 Золотая чаша", class:"legend", chance:1, price:1000 }
+];
+
+function showPage(page) {
+document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+document.getElementById(page).classList.add('active');
+}
+
+function support() {
+window.open("https://t.me/KosmosHardoxxx");
+}
+
+function getRandomItem() {
+let rand = Math.random() * 100;
+let sum = 0;
+
+for (let item of items) {
+sum += item.chance;
+if (rand <= sum) return item;
+}
+}
+
+function startRoll() {
+let roll = document.getElementById("roll");
+roll.innerHTML = "";
+
+let resultItem = getRandomItem();
+
+// создаем прокрутку
+let list = [];
+for (let i = 0; i < 30; i++) {
+let item = items[Math.floor(Math.random() * items.length)];
+list.push(item);
+}
+
+// вставляем выигрыш ближе к концу
+list[25] = resultItem;
+
+list.forEach(i => {
+let div = document.createElement("div");
+div.className = "item " + i.class;
+div.innerText = i.name;
+roll.appendChild(div);
+});
+
+roll.scrollLeft = 0;
+
+let scroll = 0;
+let interval = setInterval(() => {
+scroll += 20;
+roll.scrollLeft = scroll;
+
+if (scroll >= 3000) {
+clearInterval(interval);
+
+document.getElementById("result").innerText = "Выпало: " + resultItem.name;
+
+inventory.push(resultItem);
+renderInventory();
+}
+}, 30);
+}
+
+function renderInventory() {
+let container = document.getElementById("items");
+container.innerHTML = "";
+
+inventory.forEach((item, index) => {
+let div = document.createElement("div");
+div.className = "inventory-item " + item.class;
+
+div.innerHTML = `
+${item.name} (${item.price})
+<br>
+<button class="sell" onclick="sell(${index})">Продать</button>
+`;
+
+container.appendChild(div);
+});
+}
+
+function sell(index) {
+inventory.splice(index,1);
+renderInventory();
+}
+</script>
 
 </body>
 </html>
+
